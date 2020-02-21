@@ -32,7 +32,11 @@ h1 {
 }
 
 #notes {
-    font-size: 0.6em;
+    font-size: 0.8em;
+}
+
+#map {
+    float: right;
 }
 
 #footer {
