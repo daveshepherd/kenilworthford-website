@@ -5,12 +5,12 @@ const WELL_OVER_THE_PAVEMENT = 1.732;
 function updateStatus() {
     jQuery(document).ready(function () {
         $.getJSON("https://environment.data.gov.uk/flood-monitoring/data/readings?latest", function (json) {
-            let me = json.items.filter((item) => {
+            let record = json.items.filter((item) => {
                 return item['@id'].startsWith('http://environment.data.gov.uk/flood-monitoring/data/readings/2627-level-stage-i-15_min-mASD/');
             })
-            const fordDepth = me[0].value;
-            const dateTime = Date.parse(me[0].dateTime);
-            $('#fordHeight').text(`The ford is about ${fordDepth}m`);
+            const fordDepth = record[0].value;
+            const dateTime = Date.parse(record[0].dateTime);
+            $('#fordHeight').text(`The ford is about ${fordDepth.toFixed(2)}m`);
             $('#lastUpdated').text(`Recorded ${jQuery.timeago(dateTime)}`);
 
             if (fordDepth >= WELL_OVER_THE_PAVEMENT) {
