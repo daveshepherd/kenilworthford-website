@@ -14,17 +14,17 @@ function updateStatus() {
             $('#lastUpdated').text(`Recorded ${jQuery.timeago(dateTime)}`);
 
             if (fordDepth >= WELL_OVER_THE_PAVEMENT) {
-                $('#fordStatus').text(`Definitely - bring a snorkel, it's well over the pavement`);
+                $('#fordStatus').text(`Definitely - bring a snorkel`);
                 $('#fordStatus').css({
                     backgroundColor: 'red'
                 });
             } else if (fordDepth >= PASSABLE_MAX_DEPTH) {
-                $('#fordStatus').text(`Yes, it's pretty high and may not be passable`);
+                $('#fordStatus').text(`Yes - it's probably too high, find another route`);
                 $('#fordStatus').css({
                     backgroundColor: 'red'
                 });
             } else if (fordDepth >= NOT_FLOODED_MAX_DEPTH) {
-                $('#fordStatus').text(`Yes, but it's probably ok`);
+                $('#fordStatus').text(`Yes - the ford is flooded, but it's not too deep yet`);
                 $('#fordStatus').css({
                     backgroundColor: 'orange'
                 });
