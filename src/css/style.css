@@ -47,21 +47,19 @@ h1 {
 
 #fordHeight {
   float: left;
+  font-size: 0.7em;
   margin-left: 25px;
 }
 
 #lastUpdated {
   float: right;
+  font-size: 0.7em;
   margin-right: 25px;
   text-align: right;
 }
 
 #notes {
-  font-size: 0.8vw;
-}
-
-#footer {
-  font-size: 0.6vw;
+  font-size: 0.8em;
 }
 
 .google-maps {
