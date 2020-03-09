@@ -10,20 +10,21 @@ const NOT_FLOODED_MAX_DEPTH = 1.18;
 const PASSABLE_MAX_DEPTH = 1.22;
 const WELL_OVER_THE_PAVEMENT = 1.732;
 
+let readingsApi = 'https://environment.data.gov.uk/flood-monitoring/data/readings?latest';
 if (process.env.NODE_ENV !== 'production') {
-  console.log('Looks like we are in development mode!');
+  readingsApi = 'http://kenilworthford-website.s3-website-eu-west-1.amazonaws.com/dev/api/readings.json';
 }
 
 function updateStatus() {
   jQuery(document).ready(function () {
-    $.getJSON("https://environment.data.gov.uk/flood-monitoring/data/readings?latest", function (json) {
+    $.getJSON(readingsApi, function (json) {
       let record = json.items.filter((item) => {
         return item['@id'].startsWith('http://environment.data.gov.uk/flood-monitoring/data/readings/2627-level-stage-i-15_min-mASD/');
       })
       const fordDepth = record[0].value;
       const dateTime = moment(record[0].dateTime).fromNow();
-      $('#fordHeight').text(`The ford is about ${fordDepth.toFixed(2)}m`);
-      $('#lastUpdated').text(`Recorded ${dateTime}`);
+      $('#fordHeight').text(`Depth: ${fordDepth.toFixed(2)}m`);
+      $('#lastUpdated').text(dateTime);
 
       if (fordDepth >= WELL_OVER_THE_PAVEMENT) {
         $('#fordStatus').text(`Definitely - bring a snorkel`);
