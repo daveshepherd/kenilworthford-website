@@ -11,7 +11,7 @@ module.exports = {
     new MiniCssExtractPlugin({
         filename: 'assets/[contenthash].css',
       }
-    )
+    ),
   ],
   output: {
     filename: 'assets/[name].[contenthash].js',
