@@ -1,0 +1,44 @@
+body {
+  font-family: Verdana;
+  font-size: 1em;
+  margin: 10px 5%;
+}
+
+h1 {
+  text-align: center;
+}
+
+#statusPanel {
+  margin: 40px 10%;
+}
+
+#fordStatus {
+  background-color: #ccc;
+  border-radius: 25px;
+  font-size: 40px;
+  padding: 50px 0;
+  text-align: center;
+}
+
+#fordHeight {
+  float: left;
+  margin-left: 25px;
+}
+
+#lastUpdated {
+  float: right;
+  margin-right: 25px;
+  text-align: right;
+}
+
+#notes {
+  font-size: 0.8em;
+}
+
+#map {
+  float: right;
+}
+
+#footer {
+  font-size: 0.6em;
+}
