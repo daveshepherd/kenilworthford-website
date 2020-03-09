@@ -16,12 +16,12 @@ module.exports = {
       title: 'Is Kenilworth ford flooded?',
     }),
     new MiniCssExtractPlugin({
-        filename: 'style.[contenthash].css',
+        filename: 'assets/[contenthash].css',
       }
     )
   ],
   output: {
-    filename: '[name].[contenthash].js',
+    filename: 'assets/[name].[contenthash].js',
     path: path.resolve(__dirname, 'dist'),
   },
   optimization: {
@@ -48,9 +48,10 @@ module.exports = {
       },
       {
         test: /\.(png|svg|jpg|gif)$/,
-        use: [
-          'file-loader',
-        ],
+        loader: 'file-loader',
+        options: {
+          name: 'assets/[contenthash].[ext]',
+        },
       },
     ],
   },
