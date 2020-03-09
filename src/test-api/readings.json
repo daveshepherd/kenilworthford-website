@@ -1,0 +1,20 @@
+{
+  "@context" : "http://environment.data.gov.uk/flood-monitoring/meta/context.jsonld" ,
+  "meta" : {
+    "publisher" : "Environment Agency" ,
+    "licence" : "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" ,
+    "documentation" : "http://environment.data.gov.uk/flood-monitoring/doc/reference" ,
+    "version" : "0.9" ,
+    "comment" : "Status: Beta service" ,
+    "hasFormat" : [ "http://environment.data.gov.uk/flood-monitoring/data/readings.csv?latest", "http://environment.data.gov.uk/flood-monitoring/data/readings.rdf?latest", "http://environment.data.gov.uk/flood-monitoring/data/readings.ttl?latest", "http://environment.data.gov.uk/flood-monitoring/data/readings.html?latest" ]
+  }
+   ,
+  "items" : [ {
+    "@id" : "http://environment.data.gov.uk/flood-monitoring/data/readings/2627-level-stage-i-15_min-mASD/2020-03-09T13-45-00Z" ,
+    "dateTime" : "2020-03-09T13:45:00Z" ,
+    "measure" : "http://environment.data.gov.uk/flood-monitoring/id/measures/2627-level-stage-i-15_min-mASD" ,
+    "value" : 1.212
+  }
+   ]
+}
+

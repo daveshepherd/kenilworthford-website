@@ -1,14 +1,18 @@
 import '../css/style.css';
 
 import moment from 'moment';
-
 import $ from 'jquery';
+
 window.jQuery = $;
 window.$ = $;
 
 const NOT_FLOODED_MAX_DEPTH = 1.18;
 const PASSABLE_MAX_DEPTH = 1.22;
 const WELL_OVER_THE_PAVEMENT = 1.732;
+
+if (process.env.NODE_ENV !== 'production') {
+  console.log('Looks like we are in development mode!');
+}
 
 function updateStatus() {
   jQuery(document).ready(function () {
