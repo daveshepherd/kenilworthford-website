@@ -7,8 +7,9 @@ window.jQuery = $;
 window.$ = $;
 
 const NOT_FLOODED_MAX_DEPTH = 1.18;
-const PASSABLE_MAX_DEPTH = 1.22;
-const WELL_OVER_THE_PAVEMENT = 1.732;
+const PASSABLE_WARNING_DEPTH = 1.22;
+const PASSABLE_MAX_DEPTH = 1.25;
+const WELL_OVER_THE_PAVEMENT = 1.730;
 
 let readingsApi = 'https://environment.data.gov.uk/flood-monitoring/data/readings?latest';
 if (process.env.NODE_ENV !== 'production') {
@@ -36,6 +37,11 @@ function updateStatus() {
         $('#fordStatus').css({
           backgroundColor: 'red'
         });
+      } else if (fordDepth >= PASSABLE_WARNING_DEPTH) {
+        $('#fordStatus').text(`Yes - it might be too deep for you, consider another route`);
+        $('#fordStatus').css({
+          backgroundColor: 'red'
+        });
       } else if (fordDepth >= NOT_FLOODED_MAX_DEPTH) {
         $('#fordStatus').text(`Yes - the ford is flooded, but it's not too deep yet`);
         $('#fordStatus').css({
@@ -53,3 +59,5 @@ function updateStatus() {
 };
 
 updateStatus();
+
+import './chart';
