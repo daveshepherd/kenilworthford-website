@@ -1,5 +1,3 @@
-import '../css/style.css';
-
 import moment from 'moment';
 import $ from 'jquery';
 
@@ -11,19 +9,17 @@ const PASSABLE_WARNING_DEPTH = 1.22;
 const PASSABLE_MAX_DEPTH = 1.25;
 const WELL_OVER_THE_PAVEMENT = 1.730;
 
-let readingsApi = 'https://environment.data.gov.uk/flood-monitoring/data/readings?latest';
+let readingsApi = 'https://api.kenilworthford.com/status';
 if (process.env.NODE_ENV !== 'production') {
-  readingsApi = 'http://kenilworthford-website.s3-website-eu-west-1.amazonaws.com/dev/api/readings.json';
+  readingsApi = 'https://api.dev.kenilworthford.com/status';
 }
 
 function updateStatus() {
   jQuery(document).ready(function () {
-    $.getJSON(readingsApi, function (json) {
-      let record = json.items.filter((item) => {
-        return item['@id'].startsWith('http://environment.data.gov.uk/flood-monitoring/data/readings/2627-level-stage-i-15_min-mASD/');
-      })
-      const fordDepth = record[0].value;
-      const dateTime = moment(record[0].dateTime).fromNow();
+    $.getJSON(readingsApi, function (result) {
+      const fordDepth = result.depth;
+      const dateTime = moment(result.lastUpdate).fromNow();
+
       $('#fordHeight').text(`Depth: ${fordDepth.toFixed(2)}m`);
       $('#lastUpdated').text(dateTime);
 
@@ -34,11 +30,6 @@ function updateStatus() {
         });
       } else if (fordDepth >= PASSABLE_MAX_DEPTH) {
         $('#fordStatus').text(`Yes - it's probably too high, find another route`);
-        $('#fordStatus').css({
-          backgroundColor: 'red'
-        });
-      } else if (fordDepth >= PASSABLE_WARNING_DEPTH) {
-        $('#fordStatus').text(`Yes - it might be too deep for you, consider another route`);
         $('#fordStatus').css({
           backgroundColor: 'red'
         });
@@ -59,5 +50,3 @@ function updateStatus() {
 };
 
 updateStatus();
-
-import './chart';

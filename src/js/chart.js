@@ -11,8 +11,13 @@ const NOT_FLOODED_MAX_DEPTH = 1.18;
 const PASSABLE_MAX_DEPTH = 1.22;
 const WELL_OVER_THE_PAVEMENT = 1.732;
 
+let chartApi = 'https://api.kenilworthford.com/chart';
+if (process.env.NODE_ENV !== 'production') {
+  chartApi = 'https://api.dev.kenilworthford.com/chart';
+}
+
 Highcharts.getJSON(
-  'https://api.kenilworthford.com/chart',
+  chartApi,
   function (data) {
     Highcharts.stockChart('container', {
       chart: {

@@ -13,8 +13,21 @@ module.exports = merge(common, {
       {from: './src/test-api', to: 'api'},
     ]),
     new HtmlWebpackPlugin({
+      chunks: ['app', 'css', 'runtime', 'vendors'],
       filename: 'index.html',
       template: './src/index.html',
+      title: 'Is Kenilworth ford flooded? (DEV)',
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['css'],
+      filename: 'about.html',
+      template: './src/about.html',
+      title: 'Is Kenilworth ford flooded? (DEV)',
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['chart', 'css', 'runtime', 'vendors'],
+      filename: 'chart.html',
+      template: './src/chart.html',
       title: 'Is Kenilworth ford flooded? (DEV)',
     }),
     new S3Plugin({

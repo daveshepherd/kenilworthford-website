@@ -9,8 +9,21 @@ module.exports = merge(common, {
   mode: 'production',
   plugins: [
     new HtmlWebpackPlugin({
+      chunks: ['app', 'css', 'runtime', 'vendors'],
       filename: 'index.html',
       template: './src/index.html',
+      title: 'Is Kenilworth ford flooded?',
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['css'],
+      filename: 'about.html',
+      template: './src/about.html',
+      title: 'Is Kenilworth ford flooded?',
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['chart', 'css', 'runtime', 'vendors'],
+      filename: 'chart.html',
+      template: './src/chart.html',
       title: 'Is Kenilworth ford flooded?',
     }),
     new S3Plugin({

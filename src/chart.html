@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="<%= require('./images/favicon.png').default %>">
+  <meta name="Description" content="Historic levels for Kenilworth ford">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= htmlWebpackPlugin.options.title %></title>
+</head>
+<body>
+
+<h1><%= htmlWebpackPlugin.options.title %></h1>
+<ul>
+  <li><a href="index.html">home</a></li>
+  <li><a href="about.html">about</a></li>
+  <li><a href="chart.html">chart</a></li>
+</ul>
+
+<figure class="chart">
+  <div id="container"></div>
+</figure>
+</body>
+</html>
+

@@ -5,6 +5,8 @@ const path = require('path');
 module.exports = {
   entry: {
     app: './src/js/index.js',
+    chart: './src/js/chart.js',
+    css: './src/css/style.css',
   },
   plugins: [
     new CleanWebpackPlugin(),
@@ -35,7 +37,12 @@ module.exports = {
       {
         test: /\.css$/,
         use: [
-          MiniCssExtractPlugin.loader,
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              publicPath: '../',
+            }
+          },
           'css-loader',
         ],
       },
