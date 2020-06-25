@@ -23,26 +23,20 @@ function updateStatus() {
       $('#fordHeight').text(`Depth: ${fordDepth.toFixed(2)}m`);
       $('#lastUpdated').text(dateTime);
 
+      $('#statusPanel').removeClass();
+
       if (fordDepth >= WELL_OVER_THE_PAVEMENT) {
         $('#fordStatus').text(`Definitely - bring a snorkel`);
-        $('#fordStatus').css({
-          backgroundColor: 'red'
-        });
+        $('#statusPanel').addClass('danger');
       } else if (fordDepth >= PASSABLE_MAX_DEPTH) {
         $('#fordStatus').text(`Yes - it's probably too high, find another route`);
-        $('#fordStatus').css({
-          backgroundColor: 'red'
-        });
+        $('#statusPanel').addClass('danger');
       } else if (fordDepth >= NOT_FLOODED_MAX_DEPTH) {
         $('#fordStatus').text(`Yes - the ford is flooded, but it's not too deep yet`);
-        $('#fordStatus').css({
-          backgroundColor: 'orange'
-        });
+        $('#statusPanel').addClass('warning');
       } else {
         $('#fordStatus').text(`No`);
-        $('#fordStatus').css({
-          backgroundColor: 'green'
-        });
+        $('#statusPanel').addClass('ok');
       }
     })
   });

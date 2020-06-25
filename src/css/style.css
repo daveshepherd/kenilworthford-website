@@ -38,26 +38,46 @@ h1 {
 }
 
 #statusPanel {
+  border-radius: 25px;
+  font-size: 2em;
   margin: 40px 10%;
 }
 
 #fordStatus {
-  background-color: #cccccc;
-  border-radius: 25px;
-  font-size: 2em;
   padding: 50px 0;
   text-align: center;
 }
 
 #fordHeight {
   float: left;
+  color: black;
   font-size: 0.7em;
   margin-left: 25px;
 }
 
 #lastUpdated {
   float: right;
+  color: black;
   font-size: 0.7em;
   margin-right: 25px;
   text-align: right;
+}
+
+.danger {
+  background: darkred;
+  color: #cccccc;
+}
+
+.warning {
+  background: darkorange;
+  color: black;
+}
+
+.ok {
+  background: darkgreen;
+  color: darkgrey;
+}
+
+.loading {
+  background: #cccccc;
 }
