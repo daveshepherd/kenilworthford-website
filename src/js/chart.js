@@ -19,6 +19,7 @@ if (process.env.NODE_ENV !== 'production') {
 Highcharts.getJSON(
   chartApi,
   function (data) {
+    let maxDepth = Math.max.apply(Math, data.map(function(o) { return o[1]; }))
     Highcharts.stockChart('container', {
       chart: {
         height: 400
@@ -80,6 +81,7 @@ Highcharts.getJSON(
         }
       }],
       yAxis: {
+        max: maxDepth,
         plotLines: [{
           color: 'orange',
           dashStyle: 'dash',
