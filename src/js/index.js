@@ -4,11 +4,6 @@ import $ from 'jquery';
 window.jQuery = $;
 window.$ = $;
 
-const NOT_FLOODED_MAX_DEPTH = 1.18;
-const PASSABLE_WARNING_DEPTH = 1.22;
-const PASSABLE_MAX_DEPTH = 1.25;
-const WELL_OVER_THE_PAVEMENT = 1.730;
-
 let readingsApi = 'https://api.kenilworthford.com/status';
 if (process.env.NODE_ENV !== 'production') {
   readingsApi = 'https://api.dev.kenilworthford.com/status';
@@ -23,20 +18,22 @@ function updateStatus() {
       $('#fordHeight').text(`Depth: ${fordDepth.toFixed(2)}m`);
       $('#lastUpdated').text(dateTime);
 
-      $('#statusPanel').removeClass();
-
-      if (fordDepth >= WELL_OVER_THE_PAVEMENT) {
-        $('#fordStatus').text(`Definitely - bring a snorkel`);
-        $('#statusPanel').addClass('danger');
-      } else if (fordDepth >= PASSABLE_MAX_DEPTH) {
-        $('#fordStatus').text(`Yes - it's probably too high, find another route`);
-        $('#statusPanel').addClass('danger');
-      } else if (fordDepth >= NOT_FLOODED_MAX_DEPTH) {
-        $('#fordStatus').text(`Yes - the ford is flooded, but it's not too deep yet`);
-        $('#statusPanel').addClass('warning');
+      if (result.state === 'impassable') {
+        $('#fordStatus').text('Yes');
+        $('#statusPanel').attr('class', 'statusPanel danger');
+      } else if (result.state === 'flooded') {
+        $('#fordStatus').text('Yes');
+        $('#statusPanel').attr('class', 'statusPanel warning');
       } else {
-        $('#fordStatus').text(`No`);
-        $('#statusPanel').addClass('ok');
+        $('#fordStatus').text('No');
+        $('#statusPanel').attr('class', 'statusPanel ok');
+      }
+      if (result.direction === 'rising') {
+        $('#statusIcon').html('<i class="material-icons directionIcon rising">trending_up</i>');
+      } else if (result.direction === 'falling') {
+        $('#statusIcon').html('<i class="material-icons directionIcon falling">trending_down</i>');
+      } else {
+        $('#statusIcon').empty();
       }
     })
   });

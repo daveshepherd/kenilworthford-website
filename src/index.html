@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <link rel="icon" href="<%= require('./images/favicon.png').default %>">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <meta name="Description" content="Flood information for the Kenilworth ford">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><%= htmlWebpackPlugin.options.title %></title>
@@ -17,10 +18,13 @@
 <div class="content">
   <h1><%= htmlWebpackPlugin.options.title %></h1>
 
-  <div id="statusPanel" class="loading">
-    <div id="fordStatus">Loading...</div>
-    <div id="fordHeight">Loading...</div>
-    <div id="lastUpdated">Loading...</div>
+  <div class="statusContainer">
+    <div id="statusPanel" class="statusPanel loading">
+      <div id="fordStatus" class="fordStatus">Loading...</div>
+      <div id="statusIcon" class="statusIcon"></div>
+    </div>
+    <div id="fordHeight" class="fordHeight"></div>
+    <div id="lastUpdated" class="lastUpdated"></div>
   </div>
 </div>
 </body>
