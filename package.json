@@ -1,6 +1,6 @@
 {
   "name": "webpack-demo",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "private": true,
   "scripts": {
@@ -28,8 +28,8 @@
     "webpack-s3-plugin": "^1.0.3"
   },
   "dependencies": {
-    "jquery": "^3.4.1",
     "highcharts": "^8.0.4",
+    "jquery": "^3.4.1",
     "moment": "^2.24.0"
   }
 }
