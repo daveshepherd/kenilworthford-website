@@ -14,6 +14,7 @@ module.exports = merge(common, {
   plugins: [
     new CopyPlugin([
       {from: './src/test-api', to: 'api'},
+      {from: './src/test-api/config.js', to: ''},
     ]),
     new HtmlWebpackPlugin({
       chunks: ['app', 'css', 'runtime', 'vendors'],
