@@ -1,9 +1,11 @@
-const merge = require('webpack-merge');
 const AWS = require('aws-sdk');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const merge = require('webpack-merge');
+const path = require('path');
 const S3Plugin = require('webpack-s3-plugin');
 
 const common = require('./webpack.common.js');
+const packageJson = require(`${process.cwd()}${path.sep}package.json`);
 
 module.exports = merge(common, {
   mode: 'production',
@@ -34,7 +36,7 @@ module.exports = merge(common, {
         Bucket: 'kenilworthford-website',
         CacheControl: 'public,max-age=86400',
       },
-      basePath: "/"
+      basePath: `${packageJson.version}/`,
     }),
   ],
 });
