@@ -4,7 +4,7 @@ import $ from 'jquery';
 window.jQuery = $;
 window.$ = $;
 
-let readingsApi = 'https://api.kenilworthford.com/status';
+let readingsApi = '/status';
 if (process.env.NODE_ENV !== 'production') {
   readingsApi = 'https://api.dev.kenilworthford.com/status';
 }
