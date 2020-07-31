@@ -4,7 +4,7 @@ import $ from 'jquery';
 window.jQuery = $;
 window.$ = $;
 
-let readingsApi = '/status';
+let readingsApi = `${window.__runtime_configuration.apiEndpoint}/status`;
 if (process.env.NODE_ENV !== 'production') {
   readingsApi = 'https://api.dev.kenilworthford.com/status';
 }
