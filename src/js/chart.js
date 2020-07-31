@@ -11,7 +11,7 @@ const NOT_FLOODED_MAX_DEPTH = 1.18;
 const PASSABLE_MAX_DEPTH = 1.22;
 const WELL_OVER_THE_PAVEMENT = 1.732;
 
-let chartApi = 'https://api.kenilworthford.com/chart';
+let chartApi = `${window.__runtime_configuration.apiEndpoint}/chart`;
 if (process.env.NODE_ENV !== 'production') {
   chartApi = 'https://api.dev.kenilworthford.com/chart';
 }
