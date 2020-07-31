@@ -1,10 +1,13 @@
-const merge = require('webpack-merge');
 const AWS = require('aws-sdk');
 const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const merge = require('webpack-merge');
+const path = require('path');
 const S3Plugin = require('webpack-s3-plugin');
 
 const common = require('./webpack.common.js');
+
+const packageJson = require(`${process.cwd()}${path.sep}package.json`);
 
 module.exports = merge(common, {
   mode: 'development',
@@ -31,14 +34,26 @@ module.exports = merge(common, {
       title: 'Is Kenilworth ford flooded? (DEV)',
     }),
     new S3Plugin({
+      exclude: `${packageJson.version}/assets`,
       s3Options: {
         credentials: new AWS.SharedIniFileCredentials({profile: 'endor'}),
       },
       s3UploadOptions: {
         Bucket: 'kenilworthford-website',
-        CacheControl: 'public,max-age=60',
+        CacheControl: 'public,max-age=86400',
+      },
+      basePath: `dev/${packageJson.version}/`,
+    }),
+    new S3Plugin({
+      include: `${packageJson.version}/assets`,
+      s3Options: {
+        credentials: new AWS.SharedIniFileCredentials({profile: 'endor'}),
+      },
+      s3UploadOptions: {
+        Bucket: 'kenilworthford-website',
+        CacheControl: 'public,max-age=86400',
       },
       basePath: "dev/"
-    })
+    }),
   ],
 });

@@ -2,6 +2,8 @@ const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
 
+const packageJson = require(`${process.cwd()}${path.sep}package.json`);
+
 module.exports = {
   entry: {
     app: './src/js/index.js',
@@ -11,12 +13,12 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(),
     new MiniCssExtractPlugin({
-        filename: 'assets/[contenthash].css',
+        filename: `${packageJson.version}/assets/[contenthash].css`,
       }
     ),
   ],
   output: {
-    filename: 'assets/[name].[contenthash].js',
+    filename: `${packageJson.version}/assets/[name].[contenthash].js`,
     path: path.resolve(__dirname, 'dist'),
   },
   optimization: {
@@ -50,7 +52,7 @@ module.exports = {
         test: /\.(png|svg|jpg|gif)$/,
         loader: 'file-loader',
         options: {
-          name: 'assets/[contenthash].[ext]',
+          name: `${packageJson.version}/assets/[contenthash].[ext]`,
         },
       },
     ],
