@@ -15,10 +15,12 @@ let chartApi = `${window.__runtime_configuration.apiEndpoint}/chart`;
 if (process.env.NODE_ENV !== 'production') {
   chartApi = 'https://api.dev.kenilworthford.com/chart';
 }
+// TODO: loading information
 
 Highcharts.getJSON(
   chartApi,
   function (data) {
+    // TODO: https://api.highcharts.com/highcharts/time.timezone
     let maxDepth = Math.max.apply(Math, data.map(function(o) { return o[1]; }))
     Highcharts.stockChart('container', {
       chart: {
