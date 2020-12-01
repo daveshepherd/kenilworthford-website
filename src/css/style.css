@@ -118,3 +118,15 @@ h1 {
 .falling {
   color: lightgreen
 }
+
+/* twitter */
+
+.twitter-container {
+  font-size: 0.75em;
+  padding: 20px 0;
+  text-align: center;
+}
+
+.twitter-container iframe {
+  vertical-align: -5px;
+}
