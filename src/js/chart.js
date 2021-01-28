@@ -89,7 +89,7 @@ Highcharts.getJSON(
           dashStyle: 'dash',
           label: {
             text: 'Flooding possible',
-            align: 'right',
+            align: 'left',
             y: 12,
             x: 0
           },
