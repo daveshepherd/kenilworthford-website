@@ -35,7 +35,7 @@ module.exports = merge(common, {
         credentials: new AWS.SharedIniFileCredentials({profile: 'endor'}),
       },
       s3UploadOptions: {
-        Bucket: 'kenilworthford-website',
+        Bucket: 'prod-kenilworthford-website-eu-west-1-238573916854',
         CacheControl: 'public,max-age=86400',
       },
       basePath: `${packageJson.version}/`,
@@ -46,7 +46,7 @@ module.exports = merge(common, {
         credentials: new AWS.SharedIniFileCredentials({profile: 'endor'}),
       },
       s3UploadOptions: {
-        Bucket: 'kenilworthford-website',
+        Bucket: 'prod-kenilworthford-website-eu-west-1-238573916854',
         CacheControl: 'public,max-age=86400',
       },
     }),
