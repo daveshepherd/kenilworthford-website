@@ -79,6 +79,10 @@ Highcharts.getJSON(
           valueDecimals: 2
         }
       }],
+      xAxis: {
+        ordinal: false,
+        type: 'datetime'
+      },
       yAxis: {
         max: maxDepth,
         plotLines: [{
