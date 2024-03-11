@@ -10,6 +10,8 @@ $ yarn
 $ yarn watch
 ```
 
+You can open `dist/index.hml` to view the web page.
+
 Build the production site
 
 ```

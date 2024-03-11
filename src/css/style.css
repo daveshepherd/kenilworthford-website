@@ -42,6 +42,10 @@ h1 {
   margin: 10px 5%;
 }
 
+.siteStatus {
+  text-align: center;
+}
+
 /* status panel */
 
 .statusContainer {
@@ -104,6 +108,10 @@ h1 {
 }
 
 .loading {
+  background: #cccccc;
+}
+
+.unavailable {
   background: #cccccc;
 }
 
