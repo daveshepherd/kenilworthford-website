@@ -7,7 +7,7 @@ addData(Highcharts);
 addExporting(Highcharts);
 addExportData(Highcharts);
 
-const NOT_FLOODED_MAX_DEPTH = 1.18;
+const NOT_FLOODED_MAX_DEPTH = 1.23;
 const PASSABLE_MAX_DEPTH = 1.22;
 const WELL_OVER_THE_PAVEMENT = 1.732;
 

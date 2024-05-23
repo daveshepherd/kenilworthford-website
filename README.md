@@ -12,6 +12,8 @@ $ yarn watch
 
 You can open `dist/index.hml` to view the web page.
 
+You might need this  export NODE_OPTIONS=--openssl-legacy-provider
+
 Build the production site
 
 ```
