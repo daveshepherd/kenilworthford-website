@@ -1,20 +1,16 @@
-import Highcharts from 'highcharts/highstock';
-import addData from 'highcharts/modules/data';
-import addExporting from 'highcharts/modules/exporting';
-import addExportData from 'highcharts/modules/export-data';
-
-addData(Highcharts);
-addExporting(Highcharts);
-addExportData(Highcharts);
+import Highcharts from "highcharts/highstock";
+import "highcharts/modules/data";
+import "highcharts/modules/exporting";
+import "highcharts/modules/export-data";
 
 // Configure global options to handle UTF-8 properly
 Highcharts.setOptions({
   lang: {
-    thousandsSep: ','
+    thousandsSep: ",",
   },
   time: {
-    useUTC: false
-  }
+    useUTC: false,
+  },
 });
 
 const NOT_FLOODED_MAX_DEPTH = 1.23;
@@ -24,93 +20,109 @@ const WELL_OVER_THE_PAVEMENT = 1.732;
 let chartApi = `${window.__runtime_configuration.apiEndpoint}/chart`;
 // TODO: loading information
 
-Highcharts.getJSON(
-  chartApi,
-  function (data) {
-    // TODO: https://api.highcharts.com/highcharts/time.timezone
-    let maxDepth = Math.max.apply(Math, data.map(function(o) { return o[1]; }))
-    Highcharts.stockChart('container', {
-      chart: {
-        height: 400
-      },
-      rangeSelector: {
-        buttons: [{
-          type: 'day',
+Highcharts.getJSON(chartApi, function (data) {
+  // TODO: https://api.highcharts.com/highcharts/time.timezone
+  let maxDepth = Math.max.apply(
+    Math,
+    data.map(function (o) {
+      return o[1];
+    })
+  );
+  Highcharts.stockChart("container", {
+    chart: {
+      height: 400,
+    },
+    rangeSelector: {
+      buttons: [
+        {
+          type: "day",
           count: 1,
-          text: '1d'
-        }, {
-          type: 'week',
+          text: "1d",
+        },
+        {
+          type: "week",
           count: 1,
-          text: '1w'
-        }, {
-          type: 'month',
+          text: "1w",
+        },
+        {
+          type: "month",
           count: 1,
-          text: '1m'
-        }, {
-          type: 'month',
+          text: "1m",
+        },
+        {
+          type: "month",
           count: 6,
-          text: '6m'
-        }, {
-          type: 'year',
+          text: "6m",
+        },
+        {
+          type: "year",
           count: 1,
-          text: '1y'
-        }, {
-          type: 'all',
-          text: 'All'
-        }],
-        inputDateFormat: '%d/%m/%Y',
-        selected: 1
+          text: "1y",
+        },
+        {
+          type: "all",
+          text: "All",
+        },
+      ],
+      inputDateFormat: "%d/%m/%Y",
+      selected: 1,
+    },
+    exporting: {
+      csv: {
+        dateFormat: "%d/%m/%Y %H:%M:%S",
       },
-      exporting: {
-        csv: {
-          dateFormat: '%d/%m/%Y %H:%M:%S'
-        }
-      },
-      responsive: {
-        rules: [{
+    },
+    responsive: {
+      rules: [
+        {
           condition: {
-            maxWidth: 500
+            maxWidth: 500,
           },
           chartOptions: {
             chart: {
-              height: 300
+              height: 300,
             },
             rangeSelector: {
               inputEnabled: false,
             },
             navigator: {
-              enabled: false
+              enabled: false,
             },
             subtitle: {
-              text: null
+              text: null,
             },
-          }
-        }]
-      },
-      series: [{
-        name: 'Depth (m)',
+          },
+        },
+      ],
+    },
+    series: [
+      {
+        name: "Depth (m)",
         data: data,
         tooltip: {
-          valueDecimals: 2
-        }
-      }],
-      xAxis: {
-        ordinal: false,
-        type: 'datetime'
+          valueDecimals: 2,
+        },
       },
-      yAxis: {
-        max: maxDepth,
-        plotLines: [{
-          color: 'orange',
-          dashStyle: 'dash',
+    ],
+    xAxis: {
+      ordinal: false,
+      type: "datetime",
+    },
+    yAxis: {
+      max: maxDepth,
+      plotLines: [
+        {
+          color: "orange",
+          dashStyle: "dash",
           label: {
-            text: 'Flooding possible',
-            align: 'left',
+            text: "Flooding possible",
+            align: "left",
             y: 12,
-            x: 0
+            x: 0,
           },
-          value: NOT_FLOODED_MAX_DEPTH
-        }],
-      }
-    });
+          value: NOT_FLOODED_MAX_DEPTH,
+        },
+      ],
+    },
   });
+});
