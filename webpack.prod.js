@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const path = require('path');
 const S3Plugin = require('webpack-s3-plugin');
 

@@ -22,7 +22,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
   },
   optimization: {
-    moduleIds: 'hashed',
+    moduleIds: 'deterministic',
     runtimeChunk: 'single',
     splitChunks: {
       cacheGroups: {
@@ -65,9 +65,9 @@ module.exports = {
       },
       {
         test: /\.(png|svg|jpg|gif)$/,
-        loader: 'file-loader',
-        options: {
-          name: `${packageJson.version}/assets/[contenthash].[ext]`,
+        type: 'asset/resource',
+        generator: {
+          filename: `${packageJson.version}/assets/[contenthash][ext]`,
         },
       },
     ],

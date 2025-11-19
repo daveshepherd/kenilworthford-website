@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk');
 const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const path = require('path');
 const S3Plugin = require('webpack-s3-plugin');
 
@@ -12,10 +12,12 @@ const packageJson = require(`${process.cwd()}${path.sep}package.json`);
 module.exports = merge(common, {
   mode: 'development',
   plugins: [
-    new CopyPlugin([
-      {from: './src/test-api', to: 'api'},
-      {from: './src/test-api/config.js', to: ''},
-    ]),
+    new CopyPlugin({
+      patterns: [
+        {from: './src/test-api', to: 'api'},
+        {from: './src/test-api/config.js', to: ''},
+      ],
+    }),
     new HtmlWebpackPlugin({
       chunks: ['app', 'css', 'runtime', 'vendors'],
       filename: 'index.html',
