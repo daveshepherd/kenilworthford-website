@@ -37,6 +37,21 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.js$/,
+        include: [
+          path.resolve(__dirname, 'src'),
+          // Include node_modules/highcharts for transpilation
+          path.resolve(__dirname, 'node_modules/highcharts')
+        ],
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env'],
+            cacheDirectory: true
+          }
+        }
+      },
+      {
         test: /\.css$/,
         use: [
           {

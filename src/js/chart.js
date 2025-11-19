@@ -7,6 +7,16 @@ addData(Highcharts);
 addExporting(Highcharts);
 addExportData(Highcharts);
 
+// Configure global options to handle UTF-8 properly
+Highcharts.setOptions({
+  lang: {
+    thousandsSep: ','
+  },
+  time: {
+    useUTC: false
+  }
+});
+
 const NOT_FLOODED_MAX_DEPTH = 1.23;
 const PASSABLE_MAX_DEPTH = 1.22;
 const WELL_OVER_THE_PAVEMENT = 1.732;
@@ -50,6 +60,11 @@ Highcharts.getJSON(
         }],
         inputDateFormat: '%d/%m/%Y',
         selected: 1
+      },
+      exporting: {
+        csv: {
+          dateFormat: '%d/%m/%Y %H:%M:%S'
+        }
       },
       responsive: {
         rules: [{
