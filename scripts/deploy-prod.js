@@ -52,6 +52,24 @@ function getCacheControl(fileName) {
   return CACHE_CONTROL_ASSETS;
 }
 
+// Check if file is gzipped
+function isGzipFile(fileName) {
+  return fileName.endsWith('.gz');
+}
+
+// Get original file name for gzipped files
+function getOriginalFileName(fileName) {
+  if (isGzipFile(fileName)) {
+    return fileName.slice(0, -3); // Remove .gz extension
+  }
+  return fileName;
+}
+
+// Get content encoding for gzipped files
+function getContentEncoding(fileName) {
+  return isGzipFile(fileName) ? 'gzip' : undefined;
+}
+
 // Recursively get all files in directory
 async function getAllFiles(dir, baseDir = dir) {
   const files = [];
@@ -93,16 +111,31 @@ async function uploadFile(file) {
       s3Key = VERSION_PATH + file.key;
     }
     
-    const command = new PutObjectCommand({
+    // For gzipped files, use the original filename as the S3 key
+    if (isGzipFile(s3Key)) {
+      s3Key = getOriginalFileName(s3Key);
+    }
+    
+    const uploadParams = {
       Bucket: BUCKET_NAME,
       Key: s3Key,
       Body: fileContent,
-      ContentType: getMimeType(file.key),
-      CacheControl: getCacheControl(file.key)
-    });
+      ContentType: getMimeType(getOriginalFileName(file.key)),
+      CacheControl: getCacheControl(getOriginalFileName(file.key))
+    };
+    
+    // Add Content-Encoding for gzipped files
+    const contentEncoding = getContentEncoding(file.key);
+    if (contentEncoding) {
+      uploadParams.ContentEncoding = contentEncoding;
+    }
+    
+    const command = new PutObjectCommand(uploadParams);
     
     await s3Client.send(command);
-    console.log(`✓ Uploaded: ${s3Key}`);
+    
+    const compressionInfo = isGzipFile(file.key) ? ' (gzipped)' : '';
+    console.log(`✓ Uploaded: ${s3Key}${compressionInfo}`);
   } catch (error) {
     console.error(`✗ Failed to upload ${file.key}:`, error.message);
     throw error;
@@ -123,13 +156,36 @@ async function deployToProduction() {
     }
     
     // Get all files to upload
-    const files = await getAllFiles(DIST_DIR);
-    const assetFiles = files.filter(f => f.isAsset);
-    const nonAssetFiles = files.filter(f => !f.isAsset);
+    const allFiles = await getAllFiles(DIST_DIR);
+    
+    // Prioritize gzipped files over their uncompressed versions
+    const files = [];
+    const processedKeys = new Set();
+    
+    // First pass: add all gzipped files
+    for (const file of allFiles) {
+      if (isGzipFile(file.key)) {
+        files.push(file);
+        processedKeys.add(getOriginalFileName(file.key));
+      }
+    }
+    
+    // Second pass: add non-gzipped files that don't have gzipped versions
+    for (const file of allFiles) {
+      if (!isGzipFile(file.key) && !processedKeys.has(file.key)) {
+        files.push(file);
+      }
+    }
+    
+    const assetFiles = files.filter(f => f.isAsset || isGzipFile(f.key));
+    const nonAssetFiles = files.filter(f => !f.isAsset && !isGzipFile(f.key));
+    const gzippedFiles = files.filter(f => isGzipFile(f.key));
     
     console.log(`📦 Found ${files.length} files to upload:`);
     console.log(`   - ${assetFiles.length} asset files (long cache)`);
-    console.log(`   - ${nonAssetFiles.length} content files (versioned)\n`);
+    console.log(`   - ${nonAssetFiles.length} content files (versioned)`);
+    console.log(`   - ${gzippedFiles.length} gzipped files (optimized)`);
+    console.log(`   🗜️  Using gzipped versions where available for better performance\n`);
     
     // Upload files
     for (const file of files) {
