@@ -1,4 +1,3 @@
-const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
 
@@ -11,13 +10,13 @@ module.exports = {
     css: './src/css/style.css',
   },
   plugins: [
-    new CleanWebpackPlugin(),
     new MiniCssExtractPlugin({
         filename: `${packageJson.version}/assets/[contenthash].css`,
       }
     ),
   ],
   output: {
+    clean: true, // Clean the output directory before emit
     filename: `${packageJson.version}/assets/[name].[contenthash].js`,
     path: path.resolve(__dirname, 'dist'),
   },
