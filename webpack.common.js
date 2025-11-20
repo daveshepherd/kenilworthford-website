@@ -23,15 +23,31 @@ module.exports = {
   optimization: {
     moduleIds: 'deterministic',
     runtimeChunk: 'single',
+    usedExports: true, // Enable tree shaking
     splitChunks: {
+      chunks: 'all',
       cacheGroups: {
+        // Separate Highcharts into its own chunk
+        highcharts: {
+          test: /[\\/]node_modules[\\/]highcharts/,
+          name: 'highcharts',
+          priority: 20,
+          chunks: 'all',
+        },
+        // Other vendor libraries
         vendor: {
           test: /[\\/]node_modules[\\/]/,
           name: 'vendors',
+          priority: 10,
           chunks: 'all',
         },
       },
     },
+  },
+  performance: {
+    hints: 'warning',
+    maxEntrypointSize: 300000, // 300KB
+    maxAssetSize: 300000, // 300KB
   },
   module: {
     rules: [

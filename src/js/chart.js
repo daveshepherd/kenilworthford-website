@@ -1,7 +1,16 @@
+// Use selective imports to reduce bundle size - only import what we need
 import Highcharts from "highcharts/highstock";
-import "highcharts/modules/data";
+// Only import the modules we actually use
 import "highcharts/modules/exporting";
 import "highcharts/modules/export-data";
+
+// Use native fetch instead of Highcharts.getJSON for better tree shaking
+function getJSON(url, callback) {
+  fetch(url)
+    .then(response => response.json())
+    .then(data => callback(data))
+    .catch(error => console.error('Error fetching chart data:', error));
+}
 
 // Configure global options to handle UTF-8 properly
 Highcharts.setOptions({
@@ -20,7 +29,7 @@ const WELL_OVER_THE_PAVEMENT = 1.732;
 let chartApi = `${window.__runtime_configuration.apiEndpoint}/chart`;
 // TODO: loading information
 
-Highcharts.getJSON(chartApi, function (data) {
+getJSON(chartApi, function (data) {
   // TODO: https://api.highcharts.com/highcharts/time.timezone
   let maxDepth = Math.max.apply(
     Math,
