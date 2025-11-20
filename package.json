@@ -7,8 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "yarn version --patch && webpack --config webpack.prod.js",
     "build-dev": "webpack --config webpack.dev.js",
-    "deploy-dev": "npm run build-dev && node scripts/deploy-dev.js",
-    "deploy-prod": "npm run build && node scripts/deploy-prod.js",
+    "deploy": "yarn build && node scripts/deploy-prod.js",
     "preversion": "git diff-index --quiet HEAD --",
     "watch": "webpack --watch --config webpack.dev.js"
   },
@@ -34,7 +33,6 @@
   },
   "dependencies": {
     "highcharts": "^12.4.0",
-    "jquery": "^3.4.1",
-    "moment": "^2.24.0"
+    "jquery": "^3.4.1"
   }
 }

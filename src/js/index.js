@@ -1,5 +1,19 @@
-import moment from 'moment';
 import $ from 'jquery';
+
+// Native JavaScript replacement using Intl.RelativeTimeFormat
+function formatTimeAgo(date) {
+  const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+  const diffMs = Date.now() - new Date(date).getTime();
+  const diffSec = Math.floor(diffMs / 1000);
+  const diffMin = Math.floor(diffSec / 60);
+  const diffHour = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHour / 24);
+  
+  if (diffDay > 0) return rtf.format(-diffDay, 'day');
+  if (diffHour > 0) return rtf.format(-diffHour, 'hour');
+  if (diffMin > 0) return rtf.format(-diffMin, 'minute');
+  return rtf.format(-diffSec, 'second');
+}
 
 const HOUR = 3600000
 
@@ -12,7 +26,7 @@ function updateStatus() {
   jQuery(document).ready(function () {
     $.getJSON(readingsApi, function (result) {
       const fordDepth = result.depth;
-      const dateTime = moment(result.lastUpdate).fromNow();
+      const dateTime = formatTimeAgo(result.lastUpdate);
 
       $('#fordHeight').text(`Depth: ${fordDepth.toFixed(2)}m`);
       $('#lastUpdated').text(dateTime);

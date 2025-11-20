@@ -4,18 +4,12 @@ This project now uses modern AWS SDK v3 based deployment scripts instead of the 
 
 ## Available Commands
 
-### Development Deployment
-```bash
-npm run deploy-dev
-```
-- Builds the project in development mode
-- Uploads all files to S3 with `dev/` prefix
-- Sets cache control to 24 hours for all files
+### Production Deployment
 
-### Production Deployment  
 ```bash
 npm run deploy-prod
 ```
+
 - Builds the project in production mode (increments version)
 - Uploads assets to root with long cache (24 hours)
 - Uploads HTML and other files to versioned path with shorter cache (5 minutes)
@@ -24,7 +18,8 @@ npm run deploy-prod
 ## Configuration
 
 The deployment scripts use:
-- **AWS Profile**: `endor` 
+
+- **AWS Profile**: `endor`
 - **S3 Bucket**: `prod-kenilworthford-website-eu-west-1-238573916854`
 - **AWS Region**: `eu-west-1`
 
@@ -40,6 +35,7 @@ The deployment scripts use:
 ## Migration from webpack-s3-plugin
 
 The new deployment scripts provide the same functionality as the old webpack-s3-plugin but with:
+
 - Modern AWS SDK v3 (smaller bundle, better performance)
 - More reliable error handling
 - Better logging and progress indication
@@ -50,10 +46,10 @@ The new deployment scripts provide the same functionality as the old webpack-s3-
 
 You can also run the scripts directly:
 
-```bash
-# Development deployment
-node scripts/deploy-dev.js
+# Production deployment
 
-# Production deployment  
 node scripts/deploy-prod.js
+
+```
+
 ```
