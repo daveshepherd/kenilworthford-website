@@ -27,9 +27,10 @@ async function initializeChart() {
     const Highcharts = HighchartsModule.default;
     
     // Import and initialize modules
-    const [exportingModule, exportDataModule] = await Promise.all([
+    const [exportingModule, exportDataModule, accessibilityModule] = await Promise.all([
       import('highcharts/modules/exporting'),
-      import('highcharts/modules/export-data')
+      import('highcharts/modules/export-data'),
+      import('highcharts/modules/accessibility')
     ]);
     
     // Initialize modules - handle different export patterns
@@ -38,6 +39,9 @@ async function initializeChart() {
     }
     if (exportDataModule.default && typeof exportDataModule.default === 'function') {
       exportDataModule.default(Highcharts);
+    }
+    if (accessibilityModule.default && typeof accessibilityModule.default === 'function') {
+      accessibilityModule.default(Highcharts);
     }
     
     // Configure global options
