@@ -3,14 +3,17 @@
   "version": "1.0.19",
   "description": "",
   "private": true,
-  "sideEffects": ["*.css", "src/js/chart.js"],
+  "sideEffects": [
+    "*.css",
+    "src/js/chart.js"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "yarn version --patch && webpack --config webpack.prod.js",
     "build-dev": "webpack --config webpack.dev.js",
+    "serve": "webpack serve --config webpack.dev.js",
     "deploy": "yarn build && node scripts/deploy-prod.js",
-    "preversion": "git diff-index --quiet HEAD --",
-    "watch": "webpack --watch --config webpack.dev.js"
+    "preversion": "git diff-index --quiet HEAD --"
   },
   "keywords": [],
   "author": "",
@@ -30,6 +33,7 @@
     "style-loader": "^4.0.0",
     "webpack": "5.103.0",
     "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.2",
     "webpack-merge": "^6.0.1"
   },
   "dependencies": {

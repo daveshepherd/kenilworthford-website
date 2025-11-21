@@ -27,12 +27,12 @@ module.exports = {
     splitChunks: {
       chunks: 'all',
       cacheGroups: {
-        // Separate Highcharts into its own chunk
+        // Highcharts will be lazy-loaded, so handle async chunks
         highcharts: {
           test: /[\\/]node_modules[\\/]highcharts/,
           name: 'highcharts',
           priority: 20,
-          chunks: 'all',
+          chunks: 'async', // Only for dynamically imported chunks
         },
         // Other vendor libraries
         vendor: {
@@ -48,6 +48,11 @@ module.exports = {
     hints: 'warning',
     maxEntrypointSize: 300000, // 300KB
     maxAssetSize: 300000, // 300KB
+    // Filter out async chunks from performance warnings
+    assetFilter: function(assetFilename) {
+      // Don't warn about async chunks (lazy-loaded modules)
+      return !assetFilename.includes('highcharts');
+    },
   },
   module: {
     rules: [
