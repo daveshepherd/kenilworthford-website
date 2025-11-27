@@ -25,18 +25,76 @@ const HOUR = 3600000;
 const UPDATE_INTERVAL = 15 * 60000; // 15 minutes
 const STALE_THRESHOLD = 5 * 60000; // 5 minutes - when to consider data stale on tab focus
 const AGGRESSIVE_THROTTLE_THRESHOLD = 30 * 60000; // 30 minutes - detect aggressive throttling
+const HEARTBEAT_INTERVAL = 30000; // 30 seconds - check if we're still alive
+const EXTREME_STALE_THRESHOLD = 60 * 60000; // 1 hour - definitely needs refresh
 
 let readingsApi = `${window.__runtime_configuration.apiEndpoint}/status`;
 let updateTimer = null;
+let heartbeatTimer = null;
 let lastUpdateTime = 0;
 let lastVisibilityChange = Date.now();
 let backgroundStartTime = null;
 let isBackgrounded = false;
+let lastHeartbeat = Date.now();
+let consecutiveFailedHeartbeats = 0;
+
+// Heartbeat system to detect when timers have been completely suspended
+function startHeartbeat() {
+  heartbeatTimer = setInterval(() => {
+    const now = Date.now();
+    const timeSinceLastHeartbeat = now - lastHeartbeat;
+    
+    // If more than 2x the heartbeat interval has passed, we were likely suspended
+    if (timeSinceLastHeartbeat > HEARTBEAT_INTERVAL * 2) {
+      consecutiveFailedHeartbeats++;
+      console.log('Heartbeat suspension detected:', Math.round(timeSinceLastHeartbeat / 1000), 'seconds');
+      
+      // If we've been suspended, force a status refresh
+      const timeSinceUpdate = now - lastUpdateTime;
+      if (timeSinceUpdate > STALE_THRESHOLD) {
+        console.log('Forcing refresh due to heartbeat suspension');
+        fetchStatus();
+      }
+    } else {
+      consecutiveFailedHeartbeats = 0;
+    }
+    
+    lastHeartbeat = now;
+  }, HEARTBEAT_INTERVAL);
+}
+
+function stopHeartbeat() {
+  if (heartbeatTimer) {
+    clearInterval(heartbeatTimer);
+    heartbeatTimer = null;
+  }
+}
+
+// Enhanced data freshness check
+function isDataFresh() {
+  const now = Date.now();
+  const timeSinceUpdate = now - lastUpdateTime;
+  
+  // Consider data stale if:
+  // 1. More than STALE_THRESHOLD has passed, OR
+  // 2. We've had failed heartbeats (indicating suspension), OR
+  // 3. It's been over an hour (extreme case)
+  return timeSinceUpdate <= STALE_THRESHOLD && 
+         consecutiveFailedHeartbeats === 0 && 
+         timeSinceUpdate <= EXTREME_STALE_THRESHOLD;
+}
+
+// Force refresh with logging
+function forceRefreshWithIndicator(reason = '') {
+  console.log('Forcing refresh:', reason);
+  fetchStatus();
+}
 
 // Fetch and update status data
 function fetchStatus() {
   getJSON(readingsApi, function (result) {
     lastUpdateTime = Date.now();
+    consecutiveFailedHeartbeats = 0; // Reset on successful update
     updateStatusDisplay(result);
   });
 }
@@ -98,6 +156,7 @@ function handleVisibilityChange() {
     isBackgrounded = true;
     backgroundStartTime = now;
     clearTimeout(updateTimer);
+    stopHeartbeat();
     console.log('Tab backgrounded at', new Date(now).toLocaleTimeString());
   } else {
     // Tab is now visible
@@ -112,21 +171,25 @@ function handleVisibilityChange() {
       console.log('Tab foregrounded after', Math.round(backgroundDuration / 1000), 'seconds');
     }
     
-    // Check if we need to refresh data
+    // Always refresh when coming back from background on mobile (aggressive approach)
     const timeSinceUpdate = now - lastUpdateTime;
-    const shouldRefresh = timeSinceUpdate > STALE_THRESHOLD || 
-                         backgroundDuration > AGGRESSIVE_THROTTLE_THRESHOLD ||
-                         wasBackgrounded; // Always refresh when coming back from background
+    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    const shouldRefresh = !isDataFresh() || 
+                         wasBackgrounded || 
+                         backgroundDuration > STALE_THRESHOLD ||
+                         (isMobile && backgroundDuration > 60000); // 1 minute on mobile
     
     if (shouldRefresh) {
-      console.log('Refreshing data - stale for', Math.round(timeSinceUpdate / 1000), 's, backgrounded for', Math.round(backgroundDuration / 1000), 's');
-      fetchStatus();
+      const reason = `stale for ${Math.round(timeSinceUpdate / 1000)}s, backgrounded for ${Math.round(backgroundDuration / 1000)}s`;
+      forceRefreshWithIndicator(reason);
     } else {
-      console.log('Data is fresh, not refreshing');
+      fetchStatus(); // Still refresh, just without the visual indicator
     }
     
-    // Resume regular updates
+    // Resume regular updates and heartbeat
     scheduleNextUpdate();
+    startHeartbeat();
   }
 }
 
@@ -134,12 +197,17 @@ function handleVisibilityChange() {
 function handleWindowFocus() {
   const now = Date.now();
   const timeSinceUpdate = now - lastUpdateTime;
+  const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   
-  // If we haven't updated recently or if visibility API missed the background state
-  if (timeSinceUpdate > STALE_THRESHOLD || isBackgrounded) {
-    console.log('Window focused, refreshing data (timeSinceUpdate:', Math.round(timeSinceUpdate / 1000), 's)');
-    fetchStatus();
+  // Be more aggressive on mobile - always refresh if it's been more than 2 minutes
+  const mobileThreshold = isMobile ? 2 * 60000 : STALE_THRESHOLD;
+  
+  if (timeSinceUpdate > mobileThreshold || isBackgrounded || !isDataFresh()) {
+    const reason = `window focus - stale for ${Math.round(timeSinceUpdate / 1000)}s (mobile: ${isMobile})`;
+    console.log('Window focused, forcing refresh:', reason);
+    forceRefreshWithIndicator(reason);
     scheduleNextUpdate();
+    startHeartbeat();
     
     // Reset background state
     isBackgrounded = false;
@@ -152,6 +220,7 @@ function handleWindowBlur() {
   isBackgrounded = true;
   backgroundStartTime = Date.now();
   clearTimeout(updateTimer);
+  stopHeartbeat();
 }
 
 // Detect if timers have been throttled (mobile Safari, Chrome background tabs)
@@ -185,27 +254,44 @@ function initializeStatus() {
   window.addEventListener('pageshow', handleWindowFocus);
   window.addEventListener('pagehide', handleWindowBlur);
   
-  // Mouse/touch interaction can indicate the user is back
-  document.addEventListener('mousedown', function() {
-    const timeSinceUpdate = Date.now() - lastUpdateTime;
-    if (timeSinceUpdate > STALE_THRESHOLD) {
-      console.log('User interaction detected, checking for stale data');
-      fetchStatus();
-    }
+  // More aggressive interaction detection for mobile
+  const interactionEvents = ['mousedown', 'touchstart', 'click', 'scroll', 'keydown'];
+  let lastInteraction = Date.now();
+  
+  interactionEvents.forEach(eventType => {
+    document.addEventListener(eventType, function() {
+      const now = Date.now();
+      const timeSinceUpdate = now - lastUpdateTime;
+      const timeSinceLastInteraction = now - lastInteraction;
+      
+      // Only check if it's been a while since last interaction (avoid spam)
+      if (timeSinceLastInteraction > 5000) {
+        lastInteraction = now;
+        
+        if (!isDataFresh()) {
+          const reason = `${eventType} interaction - data stale for ${Math.round(timeSinceUpdate / 1000)}s`;
+          console.log('User interaction detected:', reason);
+          forceRefreshWithIndicator(reason);
+        }
+      }
+    }, { passive: true });
   });
   
-  document.addEventListener('touchstart', function() {
-    const timeSinceUpdate = Date.now() - lastUpdateTime;
-    if (timeSinceUpdate > STALE_THRESHOLD) {
-      console.log('Touch detected, checking for stale data');
-      fetchStatus();
-    }
-  });
+  // Network change detection (mobile switching between wifi/cellular)
+  if ('onLine' in navigator) {
+    window.addEventListener('online', function() {
+      console.log('Network reconnected');
+      if (!isDataFresh()) {
+        forceRefreshWithIndicator('network reconnected');
+      }
+    });
+  }
   
   // Initial fetch when page loads
   document.addEventListener('DOMContentLoaded', function () {
     fetchStatus();
     scheduleNextUpdate();
+    startHeartbeat();
   });
 }
 
