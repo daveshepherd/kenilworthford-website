@@ -2,11 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <link rel="icon" href="<%= require('./images/favicon.png') %>">
+  <link class="icon" href="<%= require('./images/favicon.png') %>">
   <meta name="Description" content="About the Kenilworth ford">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><%= htmlWebpackPlugin.options.title %> - About</title>
-  <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-P6NXG2Y71B"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -28,31 +27,43 @@
 
   <h1><%= htmlWebpackPlugin.options.title %></h1>
 
-  <p>This site provides a simple guide on whether the "Kenilworth ford" is in flood.</p>
-  <p>Flood information is for the "Kenilworth ford" which is where Finham Brook crosses Castle Road (B4103).</p>
+  <p>Welcome to <strong>Kenilworthford.com</strong>, a community resource designed to provide a quick, real-time indicator of whether the Kenilworth Ford is flooded.</p>
+  
+  <p>The ford is located where <strong>Finham Brook crosses Castle Road (B4103)</strong>.</p>
+
+  <h3>How It Works &amp; Data Limitations</h3>
+  <p>This site automatically fetches river level data using the Environment Agency’s real-time data API. However, please be aware of the following technical limitations:</p>
+  <ul>
+    <li><strong>Location Variance:</strong> The data is pulled from the nearest monitoring station, which is located <strong>downstream</strong> from the ford.</li>
+    <li><strong>Depth Variance:</strong> Any water depths displayed on this site reflect the levels at the monitoring station, <strong>not</strong> the exact depth at the ford itself. Localised conditions and rapid weather changes can cause conditions at the ford to differ from the automated readings.</li>
+  </ul>
+
   <p>
-    This site only provides guidance based on observations correlated to the level of the brook at the nearest
-    monitoring station, located down stream from the ford. Use your own judgement before travelling through the ford
-    and if you are unsure use an alternative route. This site accepts no responsibility for anyone travelling
-    through the ford.
+    Official, up-to-the-minute river levels can also be viewed directly on the 
+    <a href="https://check-for-flooding.service.gov.uk/station/9056" target="_blank" rel="noopener">Government flood warning information site</a>.
   </p>
+  
   <p>
-    Depths are given based on the readings at the monitoring station and therefore do not represent the depth at the
-    ford.
+    This uses Environment Agency flood and river level data from the 
+    <a href="https://environment.data.gov.uk/flood-monitoring/doc/reference" target="_blank" rel="noopener">real-time data API (Beta)</a>.
   </p>
-  <p>
-    Recent levels are available on the <a href="https://check-for-flooding.service.gov.uk/station/9056">
-    Government flood warning information site</a>.
-  </p>
-  <p>
-    This uses Environment Agency flood and river level data from the
-    <a href="https://environment.data.gov.uk/flood-monitoring/doc/reference">real-time data API (Beta)</a>
-  </p>
+
+  <hr class="about-divider">
+
+  <div class="about-disclaimer">
+    <h3>⚠️ Important Terms of Use &amp; Liability Disclaimer</h3>
+    <p>This website is intended <strong>strictly for general guidance and information purposes only</strong>. It does not offer definitive safety guarantees, and the data provided should not be solely relied upon to determine whether the ford is safe to cross.</p>
+    <ul>
+      <li><strong>Use Your Own Judgement:</strong> Always assess the physical conditions of the road and water before attempting to cross.</li>
+      <li><strong>If In Doubt, Divert:</strong> If you are unsure of the water depth or current, please turn around and use an alternative route.</li>
+      <li><strong>No Liability:</strong> The owners, operators, and contributors of this website accept <strong>absolutely no responsibility or legal liability</strong> for any injury, loss, damage to vehicles/property, or inconvenience resulting from the use of this website or from attempting to travel through the ford. You use this service and the ford entirely at your own risk.</li>
+    </ul>
+  </div>
 
   <iframe
     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2437.2764434027067!2d-1.5913310486754364!3d52.347271256668805!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNTLCsDIwJzUwLjIiTiAxwrAzNScyMC45Ilc!5e0!3m2!1sen!2suk!4v1582297069590!5m2!1sen!2suk"
-    width="100%" height="350" frameborder="0" style="border:0"></iframe>
+    title="Map showing Kenilworth Ford location"
+    width="100%" height="350" class="about-map"></iframe>
 </div>
 </body>
 </html>
-
