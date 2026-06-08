@@ -17,6 +17,8 @@ const DIST_DIR = path.join(__dirname, '..', 'dist');
 const VERSION_PATH = `${packageJson.version}/`;
 const CACHE_CONTROL_ASSETS = 'public,max-age=86400';
 const CACHE_CONTROL_HTML = 'public,max-age=300'; // Shorter cache for HTML files
+const CACHE_CONTROL_REVALIDATE = 'public,max-age=0,must-revalidate';
+const CACHE_CONTROL_SW = 'no-cache,no-store,must-revalidate';
 
 // Initialize S3 client
 const s3Client = new S3Client({
@@ -45,6 +47,14 @@ function getMimeType(fileName) {
 
 // Get cache control based on file type
 function getCacheControl(fileName) {
+  if (fileName === 'sw.js') {
+    return CACHE_CONTROL_SW;
+  }
+
+  if (fileName === 'manifest.webmanifest') {
+    return CACHE_CONTROL_REVALIDATE;
+  }
+
   const ext = path.extname(fileName).toLowerCase();
   if (ext === '.html') {
     return CACHE_CONTROL_HTML;
@@ -101,15 +111,9 @@ async function uploadFile(file) {
   try {
     const fileContent = await readFile(file.localPath);
     
-    // Determine S3 key based on file type
-    let s3Key;
-    if (file.isAsset) {
-      // Assets go to root with long cache
-      s3Key = file.key;
-    } else {
-      // HTML and other files go to versioned path
-      s3Key = VERSION_PATH + file.key;
-    }
+    // Keep asset keys at root, version all non-asset files.
+    // Lambda@Edge can map root requests to this versioned path.
+    let s3Key = file.isAsset ? file.key : VERSION_PATH + file.key;
     
     // For gzipped files, use the original filename as the S3 key
     if (isGzipFile(s3Key)) {

@@ -7,6 +7,7 @@ module.exports = {
   entry: {
     app: './src/js/index.js',
     chart: './src/js/chart.js',
+    pwa: './src/js/pwa.js',
     css: './src/css/style.css',
   },
   plugins: [

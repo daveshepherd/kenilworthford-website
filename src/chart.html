@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <link rel="icon" href="<%= require('./images/favicon.png') %>">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/<%= require('../package.json').version %>/assets/icon-192.png">
+  <meta name="theme-color" content="#1f3c88">
   <meta name="Description" content="Historic levels for Kenilworth ford">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><%= htmlWebpackPlugin.options.title %> - Chart</title>

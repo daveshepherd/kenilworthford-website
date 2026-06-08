@@ -24,25 +24,42 @@ module.exports = merge(common, {
       patterns: [
         {from: './src/test-api', to: 'api'},
         {from: './src/test-api/config.js', to: ''},
+        {from: './src/images/icon-192.png', to: `${packageJson.version}/assets/icon-192.png`},
+        {from: './src/images/icon-512.png', to: `${packageJson.version}/assets/icon-512.png`},
       ],
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'css', 'runtime', 'vendors'],
+      inject: false,
+      template: './src/manifest.webmanifest',
+      filename: 'manifest.webmanifest',
+      minify: false,
+      templateParameters: {
+        version: packageJson.version,
+      },
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['app', 'pwa', 'css', 'runtime', 'vendors'],
       filename: 'index.html',
       template: './src/index.html',
       title: 'Is Kenilworth ford flooded? (DEV)',
     }),
     new HtmlWebpackPlugin({
-      chunks: ['css'],
+      chunks: ['pwa', 'css', 'runtime'],
       filename: 'about.html',
       template: './src/about.html',
       title: 'Is Kenilworth ford flooded? (DEV)',
     }),
     new HtmlWebpackPlugin({
-      chunks: ['chart', 'css', 'runtime', 'vendors'],
+      chunks: ['chart', 'pwa', 'css', 'runtime', 'vendors'],
       filename: 'chart.html',
       template: './src/chart.html',
       title: 'Is Kenilworth ford flooded? (DEV)',
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['pwa', 'css', 'runtime'],
+      filename: 'offline.html',
+      template: './src/offline.html',
+      title: 'Offline - Is Kenilworth ford flooded? (DEV)',
     }),
   ],
 });
