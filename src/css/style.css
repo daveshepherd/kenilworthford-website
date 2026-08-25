@@ -139,6 +139,37 @@ h1 {
   vertical-align: -5px;
 }
 
+.pushContainer {
+  text-align: center;
+  margin: 10px 0 30px;
+}
+
+.pushButton {
+  border: 0;
+  border-radius: 6px;
+  background: #1f3c88;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.95em;
+  padding: 10px 16px;
+}
+
+.pushButton:disabled {
+  background: #777;
+  cursor: default;
+}
+
+.pushStatus {
+  color: #333;
+  font-size: 0.8em;
+  margin-top: 8px;
+  min-height: 18px;
+}
+
+.pushStatus.error {
+  color: #a40000;
+}
+
 /* about page */
 
 .about-divider {

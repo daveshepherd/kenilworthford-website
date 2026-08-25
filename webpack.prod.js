@@ -59,55 +59,10 @@ module.exports = merge(common, {
       threshold: 8192,
       minRatio: 0.8,
     }),
-    new WorkboxPlugin.GenerateSW({
+    new WorkboxPlugin.InjectManifest({
+      swSrc: './src/sw.js',
       swDest: 'sw.js',
-      clientsClaim: true,
-      skipWaiting: true,
-      navigateFallback: '/offline.html',
       maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
-      runtimeCaching: [
-        {
-          urlPattern: ({ request }) => request.destination === 'document',
-          handler: 'NetworkFirst',
-          options: {
-            cacheName: 'pages',
-            networkTimeoutSeconds: 4,
-          },
-        },
-        {
-          urlPattern: ({ request }) =>
-            request.destination === 'style' ||
-            request.destination === 'script' ||
-            request.destination === 'worker',
-          handler: 'StaleWhileRevalidate',
-          options: {
-            cacheName: 'static-resources',
-          },
-        },
-        {
-          urlPattern: ({ request }) => request.destination === 'image',
-          handler: 'CacheFirst',
-          options: {
-            cacheName: 'images',
-            expiration: {
-              maxEntries: 60,
-              maxAgeSeconds: 30 * 24 * 60 * 60,
-            },
-          },
-        },
-        {
-          urlPattern: ({ url }) => url.pathname.endsWith('/status'),
-          handler: 'NetworkFirst',
-          options: {
-            cacheName: 'api-status',
-            networkTimeoutSeconds: 4,
-            expiration: {
-              maxEntries: 20,
-              maxAgeSeconds: 10 * 60,
-            },
-          },
-        },
-      ],
     }),
   ],
   optimization: {

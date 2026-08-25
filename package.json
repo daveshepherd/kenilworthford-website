@@ -13,7 +13,9 @@
     "build-dev": "webpack --config webpack.dev.js",
     "serve": "webpack serve --config webpack.dev.js",
     "deploy": "yarn build && node scripts/deploy-prod.js",
-    "preversion": "git diff-index --quiet HEAD --"
+    "preversion": "git diff-index --quiet HEAD --",
+    "push:keys": "node scripts/push/generate-vapid-keys.js",
+    "push:test": "node scripts/push/send-test-notification.js"
   },
   "keywords": [],
   "author": "",
@@ -31,6 +33,7 @@
     "html-webpack-plugin": "^5.5.0",
     "mini-css-extract-plugin": "^2.10.2",
     "style-loader": "^4.0.0",
+    "web-push": "^3.6.7",
     "webpack": "5.107.2",
     "webpack-cli": "^7.0.3",
     "webpack-dev-server": "^5.2.2",

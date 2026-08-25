@@ -65,3 +65,12 @@ This command:
 - uploads files using `scripts/deploy-prod.js`
 - uses AWS profile `endor`
 - uploads to `prod-kenilworthford-website-eu-west-1-238573916854` in `eu-west-1`
+
+## Push Notifications
+
+See `PUSH_NOTIFICATIONS.md` for:
+
+- runtime config keys
+- VAPID key generation
+- backend subscription API contract
+- test send script usage
