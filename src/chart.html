@@ -22,21 +22,23 @@
 </head>
 <body>
 
-<div class="topnav">
-  <a href=".">home</a>
-  <a class="active" href="chart.html">chart</a>
-  <a href="about.html">about</a>
-</div>
+  <header class="top-nav">
+    <nav aria-label="Main Navigation">
+      <ul>
+        <li><a href=".">home</a></li>
+        <li><a href="chart.html" class="active" aria-current="page">chart</a></li>
+        <li><a href="about.html">about</a></li>
+      </ul>
+    </nav>
+  </header>
 
-<div class="content">
+  <main class="container">
+    <h1><%= htmlWebpackPlugin.options.title %></h1>
 
-  <h1><%= htmlWebpackPlugin.options.title %></h1>
+    <figure class="chart">
+      <div id="container"></div>
+    </figure>
 
-  <figure class="chart">
-    <div id="container"></div>
-  </figure>
-
-</div>
+  </main>
 </body>
 </html>
-

@@ -11,9 +11,6 @@ const packageJson = require(`${process.cwd()}${path.sep}package.json`);
 module.exports = merge(common, {
   mode: 'development',
   devServer: {
-    static: {
-      directory: path.join(__dirname, 'dist'),
-    },
     compress: true,
     port: 8080,
     open: true,
