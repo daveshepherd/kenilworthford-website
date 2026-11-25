@@ -69,9 +69,7 @@ const PAGES = ['index.html', 'about.html', 'chart.html', 'offline.html'];
   test('that the service worker only shows the offline page when the network fails', () => {
     const sw = read('sw.js');
     // A fallback for pages that can't be fetched or found in the cache
-    expect(sw).toMatch(
-      new RegExp(`PrecacheFallbackPlugin\\(\\{fallbackURL:"/${version.replace(/\./g, '\\.')}/offline\\.html"\\}\\)`),
-    );
+    expect(sw).toContain(`PrecacheFallbackPlugin({fallbackURL:"/${version}/offline.html"})`);
     // Not navigateFallback, which serves the offline page for every navigation
     expect(sw).not.toContain('NavigationRoute');
   });
