@@ -23,6 +23,7 @@ const project = new CdkTypeScriptApp({
   devDeps: [
     '@babel/core',
     '@babel/preset-env',
+    '@playwright/test',
     'babel-loader',
     'copy-webpack-plugin',
     'core-js',
@@ -86,8 +87,20 @@ project.cdkTasks.deploy.execArgs(
 );
 project.cdkTasks.deploy.spawn(smokeTest);
 
-project
-  .tryFindObjectFile('test/tsconfig.json')
-  ?.addOverride('compilerOptions.isolatedModules', true);
+// Browser tests of the site build, served as CloudFront serves it. They catch
+// what only a browser shows, such as the service worker breaking navigation.
+const browserTest = project.addTask('test:browser', {
+  description: 'Test the site build in a browser (needs site:build first)',
+  steps: [
+    { exec: 'playwright install chromium' },
+    { exec: 'playwright test --config test/browser/playwright.config.ts' },
+  ],
+});
+project.testTask.spawn(browserTest);
+
+const testTsconfig = project.tryFindObjectFile('test/tsconfig.json');
+testTsconfig?.addOverride('compilerOptions.isolatedModules', true);
+// The browser tests run code in the page, and Playwright's types use the DOM's
+testTsconfig?.addOverride('compilerOptions.lib', ['es2022', 'dom']);
 
 project.synth();

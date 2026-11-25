@@ -379,6 +379,21 @@
         },
         {
           "spawn": "eslint"
+        },
+        {
+          "spawn": "test:browser"
+        }
+      ]
+    },
+    "test:browser": {
+      "name": "test:browser",
+      "description": "Test the site build in a browser (needs site:build first)",
+      "steps": [
+        {
+          "exec": "playwright install chromium"
+        },
+        {
+          "exec": "playwright test --config test/browser/playwright.config.ts"
         }
       ]
     },
@@ -427,7 +442,7 @@
             "--peer",
             "--no-deprecated",
             "--dep=dev,prod,peer,optional",
-            "--filter=@babel/core,@babel/preset-env,babel-loader,copy-webpack-plugin,core-js,css-loader,esbuild,eslint-import-resolver-typescript,eslint-plugin-import,html-webpack-plugin,mini-css-extract-plugin,projen,projen-modules,style-loader,ts-node,typescript,webpack,webpack-cli,webpack-dev-server,webpack-merge,workbox-webpack-plugin,highcharts"
+            "--filter=@babel/core,@babel/preset-env,@playwright/test,babel-loader,copy-webpack-plugin,core-js,css-loader,esbuild,eslint-import-resolver-typescript,eslint-plugin-import,html-webpack-plugin,mini-css-extract-plugin,projen,projen-modules,style-loader,ts-node,typescript,webpack,webpack-cli,webpack-dev-server,webpack-merge,workbox-webpack-plugin,highcharts"
           ]
         },
         {
@@ -439,6 +454,7 @@
             "upgrade",
             "@babel/core",
             "@babel/preset-env",
+            "@playwright/test",
             "@stylistic/eslint-plugin",
             "@types/jest",
             "@types/node",

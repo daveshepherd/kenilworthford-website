@@ -4,7 +4,11 @@
   "compilerOptions": {
     "noEmit": true,
     "rootDir": "..",
-    "isolatedModules": true
+    "isolatedModules": true,
+    "lib": [
+      "es2022",
+      "dom"
+    ]
   },
   "include": [
     "**/*.ts"

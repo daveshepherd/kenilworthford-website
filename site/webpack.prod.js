@@ -24,16 +24,19 @@ module.exports = merge(common({
       swDest: 'sw.js',
       clientsClaim: true,
       skipWaiting: true,
-      // Must be a precached URL, which are all under /<version>/
-      navigateFallback: `${publicPath}offline.html`,
       maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       runtimeCaching: [
         {
+          // Pages come from the network, then the cache, then the offline
+          // page. Don't use navigateFallback for this: it serves its page for
+          // every navigation, online or not, as it's meant for single-page apps.
           urlPattern: ({ request }) => request.destination === 'document',
           handler: 'NetworkFirst',
           options: {
             cacheName: 'pages',
             networkTimeoutSeconds: 4,
+            // Must be a precached URL, which are all under /<version>/
+            precacheFallback: { fallbackURL: `${publicPath}offline.html` },
           },
         },
         {
