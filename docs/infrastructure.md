@@ -82,7 +82,7 @@ The deploy roles, `github/kenilworthford-website-provisioning`, are in endor-inf
 | --- | --- | --- |
 | Version router | [`test/website-stack/version-router.spec.ts`](../test/website-stack/version-router.spec.ts) | Runs the generated function code: routing, passthrough of versioned paths, preview validation |
 | Stack | [`test/website-stack/index.spec.ts`](../test/website-stack/index.spec.ts) | Private bucket, OAC, version folder, no pruning, Cache-Control per file type, router depends on every deployment |
-| Site build | [`test/site/build-output.spec.ts`](../test/site/build-output.spec.ts) | Every file the pages, manifest and service worker refer to is in the release, nothing refers to another release, offline fallback is precached |
+| Site build | [`test/site/build-output.spec.ts`](../test/site/build-output.spec.ts) | Every file the pages, manifest and service worker refer to is in the release, nothing refers to another release, the offline page is precached and only shown when the network fails |
 | Smoke test checks | [`test/smoke-test/checks.spec.ts`](../test/smoke-test/checks.spec.ts) | The post-deploy checks themselves, against a fake site |
 | Version and stage | [`test/version.spec.ts`](../test/version.spec.ts), [`test/stage.spec.ts`](../test/stage.spec.ts) | Version resolution and validation, API endpoint per stage |
 | **Post-deploy smoke test** | [`src/smoke-test/`](../src/smoke-test) | Run by `yarn deploy` against the live distribution. Waits up to 5 minutes for `/` to serve the release, then checks every asset it references, every page, `?version=` previews, `config.js`'s endpoint, and the service worker's and manifest's headers |
