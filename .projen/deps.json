@@ -9,6 +9,10 @@
       "type": "build"
     },
     {
+      "name": "@playwright/test",
+      "type": "build"
+    },
+    {
       "name": "@stylistic/eslint-plugin",
       "version": "^2",
       "type": "build"

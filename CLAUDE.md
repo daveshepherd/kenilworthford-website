@@ -16,6 +16,7 @@ This is a projen project (`CdkTypeScriptApp` from `projen-modules`). **`.projenr
 | Build the site only | `npx projen site:build` |
 | Local dev server | `npx projen site:serve` |
 | Unit tests | `npx jest` (site build tests skip unless the site is built) |
+| Browser tests (Playwright, needs the site built) | `npx projen test:browser` |
 | Deploy and smoke test (**deploys to AWS**) | `npx projen deploy` |
 
 Gotchas:

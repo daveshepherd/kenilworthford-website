@@ -83,11 +83,12 @@ The deploy roles, `github/kenilworthford-website-provisioning`, are in endor-inf
 | Version router | [`test/website-stack/version-router.spec.ts`](../test/website-stack/version-router.spec.ts) | Runs the generated function code: routing, passthrough of versioned paths, preview validation |
 | Stack | [`test/website-stack/index.spec.ts`](../test/website-stack/index.spec.ts) | Private bucket, OAC, version folder, no pruning, Cache-Control per file type, router depends on every deployment |
 | Site build | [`test/site/build-output.spec.ts`](../test/site/build-output.spec.ts) | Every file the pages, manifest and service worker refer to is in the release, nothing refers to another release, the offline page is precached and only shown when the network fails |
+| Browser | [`test/browser/`](../test/browser) | Runs the site build in Chromium (Playwright), served by a local server that runs the real version router and serves canned API responses: the home page shows the API's status, every page loads once the service worker controls it, and offline it serves visited pages from the cache and the offline page for the rest |
 | Smoke test checks | [`test/smoke-test/checks.spec.ts`](../test/smoke-test/checks.spec.ts) | The post-deploy checks themselves, against a fake site |
 | Version and stage | [`test/version.spec.ts`](../test/version.spec.ts), [`test/stage.spec.ts`](../test/stage.spec.ts) | Version resolution and validation, API endpoint per stage |
 | **Post-deploy smoke test** | [`src/smoke-test/`](../src/smoke-test) | Run by `yarn deploy` against the live distribution. Waits up to 5 minutes for `/` to serve the release, then checks every asset it references, every page, `?version=` previews, `config.js`'s endpoint, and the service worker's and manifest's headers |
 
-`npx projen build` runs everything except the smoke test, which needs a deployment. Run it on its own after a deploy with `npx projen smoke-test`.
+`npx projen build` runs everything except the smoke test, which needs a deployment. Run it on its own after a deploy with `npx projen smoke-test`. Run the browser tests on their own with `npx projen test:browser`, after `npx projen site:build`. A failure leaves a Playwright trace in `test-reports/browser/`.
 
 ## Rollback
 
