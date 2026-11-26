@@ -1,9 +1,10 @@
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { App, Tags } from 'aws-cdk-lib';
-import { apiEndpoint, resolveStage } from './stage';
+import { apiEndpoint, resolveStage, siteDomain } from './stage';
 import { resolveVersion } from './version';
 import { WebsiteStack } from './website-stack';
+import { CertificateStack } from './website-stack/certificate-stack';
 
 const app = new App();
 const stage = resolveStage();
@@ -17,8 +18,23 @@ if (!existsSync(join(siteDirectory, version, 'index.html'))) {
   );
 }
 
+// CloudFront only uses certificates in us-east-1, so a stage with a domain
+// has a certificate stack there, which the website stack reads across regions
+const domainName = siteDomain(stage);
+const certificateStack = domainName
+  ? new CertificateStack(app, 'KenilworthfordWebsiteCertificate', {
+    crossRegionReferences: true,
+    domainName,
+    env: { region: 'us-east-1' },
+  })
+  : undefined;
+
 new WebsiteStack(app, 'KenilworthfordWebsite', {
   apiEndpoint: apiEndpoint(stage),
+  crossRegionReferences: !!certificateStack,
+  domain: domainName && certificateStack
+    ? { name: domainName, certificate: certificateStack.certificate }
+    : undefined,
   env: { region: 'eu-west-2' },
   siteDirectory,
   version,

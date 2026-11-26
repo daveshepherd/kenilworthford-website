@@ -2,6 +2,7 @@ import { join } from 'path';
 import { App } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';
 import { configScript, WebsiteStack } from '../../src/website-stack';
+import { CertificateStack } from '../../src/website-stack/certificate-stack';
 
 const siteDirectory = join(__dirname, '..', 'fixtures', 'site');
 
@@ -144,6 +145,63 @@ describe('WebsiteStack', () => {
 
   test('that a version without a build fails', () => {
     expect(() => synth('9.9.9')).toThrow();
+  });
+});
+
+describe('WebsiteStack with a domain', () => {
+  const app = new App();
+  const certificateStack = new CertificateStack(app, 'certificate', {
+    crossRegionReferences: true,
+    domainName: 'dev.example.com',
+    env: { region: 'us-east-1' },
+  });
+  const stack = new WebsiteStack(app, 'website', {
+    apiEndpoint: 'https://api.example.com',
+    crossRegionReferences: true,
+    domain: { name: 'dev.example.com', certificate: certificateStack.certificate },
+    env: { region: 'eu-west-2' },
+    siteDirectory,
+    version: '1.2.3',
+  });
+  const template = Template.fromStack(stack);
+
+  test('that the certificate is in us-east-1 and validated by DNS', () => {
+    Template.fromStack(certificateStack).hasResourceProperties(
+      'AWS::CertificateManager::Certificate',
+      { DomainName: 'dev.example.com', ValidationMethod: 'DNS' },
+    );
+  });
+
+  test('that the distribution serves the domain over SNI with the certificate', () => {
+    template.hasResourceProperties('AWS::CloudFront::Distribution', {
+      DistributionConfig: Match.objectLike({
+        Aliases: ['dev.example.com'],
+        ViewerCertificate: Match.objectLike({
+          AcmCertificateArn: Match.anyValue(),
+          SslSupportMethod: 'sni-only',
+        }),
+      }),
+    });
+    template.hasOutput('SiteDomain', { Value: 'dev.example.com' });
+  });
+
+  test('that a certificate outside us-east-1 fails', () => {
+    expect(
+      () => new CertificateStack(new App(), 'certificate', {
+        domainName: 'dev.example.com',
+        env: { region: 'eu-west-2' },
+      }),
+    ).toThrow('us-east-1');
+  });
+});
+
+describe('WebsiteStack without a domain', () => {
+  test('that the distribution is only on its CloudFront domain', () => {
+    const template = synth();
+    template.hasResourceProperties('AWS::CloudFront::Distribution', {
+      DistributionConfig: Match.objectLike({ Aliases: Match.absent() }),
+    });
+    expect(template.findOutputs('SiteDomain')).toEqual({});
   });
 });
 

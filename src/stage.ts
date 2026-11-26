@@ -35,3 +35,20 @@ const API_ENDPOINTS: Record<Stage, string> = {
 export function apiEndpoint(stage: Stage): string {
   return API_ENDPOINTS[stage];
 }
+
+const SITE_DOMAINS: Record<Stage, string | undefined> = {
+  local: undefined,
+  development: 'dev.kenilworthford.com',
+  // Still served by the old distribution in the management account
+  production: undefined,
+};
+
+/**
+ * The domain the stage's distribution serves, if any. The hosted zones are in
+ * endor-infrastructure, which holds the certificate's validation record and
+ * points the domain at the distribution. A stage without one is only on its
+ * CloudFront domain.
+ */
+export function siteDomain(stage: Stage): string | undefined {
+  return SITE_DOMAINS[stage];
+}

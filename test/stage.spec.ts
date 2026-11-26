@@ -1,4 +1,4 @@
-import { apiEndpoint, resolveStage } from '../src/stage';
+import { apiEndpoint, resolveStage, siteDomain } from '../src/stage';
 
 describe('resolveStage', () => {
   test('that an unset or blank STAGE is local', () => {
@@ -22,5 +22,15 @@ describe('apiEndpoint', () => {
 
   test.each(['local', 'development'] as const)('that %s uses the development API', (stage) => {
     expect(apiEndpoint(stage)).toBe('https://api.dev.kenilworthford.com');
+  });
+});
+
+describe('siteDomain', () => {
+  test('that development is served at dev.kenilworthford.com', () => {
+    expect(siteDomain('development')).toBe('dev.kenilworthford.com');
+  });
+
+  test.each(['local', 'production'] as const)('that %s has no domain yet', (stage) => {
+    expect(siteDomain(stage)).toBeUndefined();
   });
 });

@@ -1,5 +1,6 @@
 import { join } from 'path';
 import { CfnOutput, Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
+import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
 import {
   AllowedMethods,
   CachePolicy,
@@ -31,6 +32,14 @@ export interface WebsiteStackProps extends StackProps {
   siteDirectory: string;
   /** The river-levels API the release's config.js points the site at. */
   apiEndpoint: string;
+  /**
+   * The domain the distribution serves, and its certificate (in us-east-1).
+   * Without one, the site is only on its CloudFront domain.
+   */
+  domain?: {
+    name: string;
+    certificate: ICertificate;
+  };
 }
 
 /**
@@ -142,6 +151,8 @@ export class WebsiteStack extends Stack {
 
     this.distribution = new Distribution(this, 'distribution', {
       comment: 'kenilworthford.com website',
+      certificate: props.domain?.certificate,
+      domainNames: props.domain ? [props.domain.name] : undefined,
       defaultBehavior: {
         allowedMethods: AllowedMethods.ALLOW_GET_HEAD,
         // Honours each file's Cache-Control
@@ -170,5 +181,8 @@ export class WebsiteStack extends Stack {
     });
     new CfnOutput(this, 'BucketName', { value: this.bucket.bucketName });
     new CfnOutput(this, 'Version', { value: version });
+    if (props.domain) {
+      new CfnOutput(this, 'SiteDomain', { value: props.domain.name });
+    }
   }
 }
