@@ -4,6 +4,12 @@ import { CdkTypeScriptApp } from 'projen-modules';
 const project = new CdkTypeScriptApp({
   cdkVersion: '2.272.0',
   codeOwners: ['daveshepherd'],
+  context: {
+    // The website stack reads the certificate from the us-east-1 stack as a
+    // stack output, without the custom resources a strong reference adds.
+    // ACM won't delete a certificate CloudFront is using anyway.
+    '@aws-cdk/core:defaultCrossStackReferences': 'weak',
+  },
   copyrightOwner: 'Dave Shepherd',
   deployments: [
     {

@@ -3,7 +3,7 @@
 This page describes what the CDK app deploys, how a release reaches the site, how it's tested and how to roll back. The source of truth is the code in [`src/`](../src). If you change the infrastructure, update this page in the same PR.
 
 - **App entry point:** [`src/main.ts`](../src/main.ts)
-- **Stack:** `KenilworthfordWebsite` ([`WebsiteStack`](../src/website-stack/index.ts)), in `eu-west-2`
+- **Stacks:** `KenilworthfordWebsite` ([`WebsiteStack`](../src/website-stack/index.ts)), in `eu-west-2`, and, for a stage with a domain, `KenilworthfordWebsiteCertificate` ([`CertificateStack`](../src/website-stack/certificate-stack.ts)), in `us-east-1`
 - **Environments:** `development` and `production`, deployed by GitHub Actions to the River Levels Dev (397002077817) and River Levels Prod (851725533908) accounts, alongside the river-levels API
 
 ## Architecture
@@ -35,9 +35,26 @@ flowchart LR
 | S3 bucket | `site-bucket` | Private, S3-managed encryption, SSL only. Retained if the stack is deleted, as it holds every release. |
 | Bucket deployments | `deploy-assets`, `deploy-service-worker`, `deploy-manifest`, `deploy-pages` | Upload the release to `<version>/`, one per Cache-Control setting (below). They never prune and keep their files when replaced, so earlier releases stay. |
 | CloudFront Function | `version-router` | Rewrites each request to the active release's folder ([`version-router.ts`](../src/website-stack/version-router.ts)). Depends on every deployment, so it only switches once the release is uploaded. |
-| CloudFront distribution | `distribution` | Origin access control to the bucket, `CachingOptimized`, managed security headers, HTTP/2 and 3, `PriceClass_100`, HTTPS redirect. |
+| CloudFront distribution | `distribution` | Origin access control to the bucket, `CachingOptimized`, managed security headers, HTTP/2 and 3, `PriceClass_100`, HTTPS redirect. Serves the stage's domain, if it has one. |
+| ACM certificate | `certificate` (certificate stack) | The stage's domain, validated by DNS. In us-east-1, as CloudFront requires. |
 
-Outputs: `DistributionDomainName`, `DistributionId`, `BucketName`, `Version`.
+Outputs: `DistributionDomainName`, `DistributionId`, `BucketName`, `Version`, and `SiteDomain` for a stage with a domain.
+
+### Domains
+
+| Stage | Domain |
+| --- | --- |
+| `development` | `dev.kenilworthford.com` |
+| `production` | None yet: `kenilworthford.com` is still on the old distribution (see [Still to do](#still-to-do)) |
+
+The domains come from `siteDomain()` in [`src/stage.ts`](../src/stage.ts). Their hosted zones are in the management account, managed by endor-infrastructure, so DNS is split:
+
+- **This app** requests the certificate and adds the domain to the distribution. The website stack reads the certificate's ARN from the certificate stack's output (a weak cross-region reference, `Fn::GetStackOutput`).
+- **endor-infrastructure** holds the certificate's validation CNAME and the A/AAAA alias records that point the domain at the distribution.
+
+ACM gives the same validation record each time for a domain in an account, so add it to endor-infrastructure before the first deploy, and the certificate is issued straight away. Until the record exists, the certificate stack's deploy waits for validation. To find the record for a new domain, request a certificate for it in the account's us-east-1 with `aws acm request-certificate --validation-method DNS`, read its `DomainValidationOptions`, then delete it.
+
+A domain can only be on one CloudFront distribution at a time. To move one here from another distribution, remove it from that distribution first, then deploy.
 
 ### Bucket layout and caching
 
@@ -111,6 +128,6 @@ Deploying from a laptop (`npx projen deploy`) needs credentials for a river-leve
 
 ## Still to do
 
-1. **Custom domain cutover.** The site is only on its CloudFront domain. `kenilworthford.com` is still served by the old distribution in the management account (endor-infrastructure `applications/prod-kenilworthford`). Moving it needs a certificate and the alias moved between accounts, which is a cutover like the API's.
+1. **Production domain cutover.** `kenilworthford.com` is still served by the old distribution in the management account (endor-infrastructure `applications/prod-kenilworthford`). Move it as for development (see [Domains](#domains)), with `associate-alias` to avoid a gap.
 2. **Regional redundancy**, like the API: a second bucket in another region, with an origin group.
 3. **Retire the old setup** after cutover: the `prod-kenilworthford` and `dev-kenilworthford` roots, the `application_config` module, and the static-website-versioning repo.
