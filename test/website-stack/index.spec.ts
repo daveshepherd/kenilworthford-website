@@ -1,10 +1,13 @@
+import { readFileSync } from 'fs';
 import { join } from 'path';
 import { App } from 'aws-cdk-lib';
-import { Match, Template } from 'aws-cdk-lib/assertions';
+import { Annotations, Match, Template } from 'aws-cdk-lib/assertions';
 import { configScript, WebsiteStack } from '../../src/website-stack';
 import { CertificateStack } from '../../src/website-stack/certificate-stack';
 
 const siteDirectory = join(__dirname, '..', 'fixtures', 'site');
+// The app's context, from cdk.json, which test apps don't read
+const { context } = JSON.parse(readFileSync(join(__dirname, '..', '..', 'cdk.json'), 'utf-8'));
 
 function synth(version = '1.2.3') {
   const stack = new WebsiteStack(new App(), 'test', {
@@ -149,7 +152,7 @@ describe('WebsiteStack', () => {
 });
 
 describe('WebsiteStack with a domain', () => {
-  const app = new App();
+  const app = new App({ context });
   const certificateStack = new CertificateStack(app, 'certificate', {
     crossRegionReferences: true,
     domainName: 'dev.example.com',
@@ -177,7 +180,10 @@ describe('WebsiteStack with a domain', () => {
       DistributionConfig: Match.objectLike({
         Aliases: ['dev.example.com'],
         ViewerCertificate: Match.objectLike({
-          AcmCertificateArn: Match.anyValue(),
+          // Read from the certificate stack's output, without custom resources
+          AcmCertificateArn: {
+            'Fn::GetStackOutput': Match.objectLike({ StackName: 'certificate', Region: 'us-east-1' }),
+          },
           SslSupportMethod: 'sni-only',
         }),
       }),
@@ -192,6 +198,45 @@ describe('WebsiteStack with a domain', () => {
         env: { region: 'eu-west-2' },
       }),
     ).toThrow('us-east-1');
+  });
+});
+
+describe('WebsiteStack with a domain still on another distribution', () => {
+  const app = new App({ context });
+  const certificateStack = new CertificateStack(app, 'certificate', {
+    crossRegionReferences: true,
+    domainName: 'example.com',
+    env: { region: 'us-east-1' },
+  });
+  const stack = new WebsiteStack(app, 'website', {
+    apiEndpoint: 'https://api.example.com',
+    crossRegionReferences: true,
+    domain: {
+      name: 'example.com',
+      certificate: certificateStack.certificate,
+      pendingMove: true,
+    },
+    env: { region: 'eu-west-2' },
+    siteDirectory,
+    version: '1.2.3',
+  });
+  const template = Template.fromStack(stack);
+
+  test('that the distribution has the certificate, ready for associate-alias, but not the domain', () => {
+    template.hasResourceProperties('AWS::CloudFront::Distribution', {
+      DistributionConfig: Match.objectLike({
+        Aliases: Match.absent(),
+        ViewerCertificate: Match.objectLike({
+          AcmCertificateArn: Match.anyValue(),
+          SslSupportMethod: 'sni-only',
+        }),
+      }),
+    });
+    expect(template.findOutputs('SiteDomain')).toEqual({});
+  });
+
+  test('that the missing domain is expected, not warned about', () => {
+    Annotations.fromStack(stack).hasNoWarning('*', Match.anyValue());
   });
 });
 

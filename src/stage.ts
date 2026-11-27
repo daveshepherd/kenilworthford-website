@@ -36,11 +36,23 @@ export function apiEndpoint(stage: Stage): string {
   return API_ENDPOINTS[stage];
 }
 
-const SITE_DOMAINS: Record<Stage, string | undefined> = {
+export interface SiteDomain {
+  /** The domain, such as dev.kenilworthford.com. */
+  name: string;
+  /**
+   * Set while the domain is still on another CloudFront distribution. The
+   * distribution gets the certificate but not the domain, so that
+   * `aws cloudfront associate-alias` can move the domain to it without a gap.
+   * Remove it once the domain has moved.
+   */
+  pendingMove?: boolean;
+}
+
+const SITE_DOMAINS: Record<Stage, SiteDomain | undefined> = {
   local: undefined,
-  development: 'dev.kenilworthford.com',
-  // Still served by the old distribution in the management account
-  production: undefined,
+  development: { name: 'dev.kenilworthford.com' },
+  // Still on the old distribution in the management account
+  production: { name: 'kenilworthford.com', pendingMove: true },
 };
 
 /**
@@ -49,6 +61,6 @@ const SITE_DOMAINS: Record<Stage, string | undefined> = {
  * points the domain at the distribution. A stage without one is only on its
  * CloudFront domain.
  */
-export function siteDomain(stage: Stage): string | undefined {
+export function siteDomain(stage: Stage): SiteDomain | undefined {
   return SITE_DOMAINS[stage];
 }

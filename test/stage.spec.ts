@@ -27,10 +27,14 @@ describe('apiEndpoint', () => {
 
 describe('siteDomain', () => {
   test('that development is served at dev.kenilworthford.com', () => {
-    expect(siteDomain('development')).toBe('dev.kenilworthford.com');
+    expect(siteDomain('development')).toEqual({ name: 'dev.kenilworthford.com' });
   });
 
-  test.each(['local', 'production'] as const)('that %s has no domain yet', (stage) => {
-    expect(siteDomain(stage)).toBeUndefined();
+  test('that production is waiting for kenilworthford.com to move from the old distribution', () => {
+    expect(siteDomain('production')).toEqual({ name: 'kenilworthford.com', pendingMove: true });
+  });
+
+  test('that local has no domain', () => {
+    expect(siteDomain('local')).toBeUndefined();
   });
 });
