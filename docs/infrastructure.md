@@ -45,7 +45,7 @@ Outputs: `DistributionDomainName`, `DistributionId`, `BucketName`, `Version`, an
 | Stage | Domain |
 | --- | --- |
 | `development` | `dev.kenilworthford.com` |
-| `production` | None yet: `kenilworthford.com` is still on the old distribution (see [Still to do](#still-to-do)) |
+| `production` | `kenilworthford.com`, still on the old distribution in the management account. The distribution has its certificate, ready for the domain to move (below). |
 
 The domains come from `siteDomain()` in [`src/stage.ts`](../src/stage.ts). Their hosted zones are in the management account, managed by endor-infrastructure, so DNS is split:
 
@@ -54,7 +54,14 @@ The domains come from `siteDomain()` in [`src/stage.ts`](../src/stage.ts). Their
 
 ACM gives the same validation record each time for a domain in an account, so add it to endor-infrastructure before the first deploy, and the certificate is issued straight away. Until the record exists, the certificate stack's deploy waits for validation. To find the record for a new domain, request a certificate for it in the account's us-east-1 with `aws acm request-certificate --validation-method DNS`, read its `DomainValidationOptions`, then delete it.
 
-A domain can only be on one CloudFront distribution at a time. To move one here from another distribution, remove it from that distribution first, then deploy.
+A domain can only be on one CloudFront distribution at a time. To move one here from another distribution:
+
+- **With a gap** (as for development): remove it from the other distribution, wait until that distribution is deleted, then deploy.
+- **Without a gap** (for production):
+  1. Set `pendingMove` on the stage's domain and deploy. The distribution gets the certificate but not the domain.
+  2. In endor-infrastructure, add a TXT record, `_<domain>`, with the distribution's domain name as its value. It authorizes the move.
+  3. In the stage's account, run `aws cloudfront associate-alias --target-distribution-id <id> --alias <domain>`. CloudFront moves the domain and serves it from this distribution straight away, even before DNS changes, because it routes by host name.
+  4. Remove `pendingMove` and deploy. Point the A/AAAA records at the distribution, and remove the TXT record.
 
 ### Bucket layout and caching
 
@@ -128,6 +135,6 @@ Deploying from a laptop (`npx projen deploy`) needs credentials for a river-leve
 
 ## Still to do
 
-1. **Production domain cutover.** `kenilworthford.com` is still served by the old distribution in the management account (endor-infrastructure `applications/prod-kenilworthford`). Move it as for development (see [Domains](#domains)), with `associate-alias` to avoid a gap.
+1. **Production domain cutover.** `kenilworthford.com` is still served by the old distribution in the management account (endor-infrastructure `applications/prod-kenilworthford`). Move it without a gap (see [Domains](#domains)).
 2. **Regional redundancy**, like the API: a second bucket in another region, with an origin group.
 3. **Retire the old setup** after cutover: the `prod-kenilworthford` and `dev-kenilworthford` roots, the `application_config` module, and the static-website-versioning repo.

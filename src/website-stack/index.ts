@@ -1,5 +1,5 @@
 import { join } from 'path';
-import { CfnOutput, Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
+import { Annotations, CfnOutput, Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
 import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
 import {
   AllowedMethods,
@@ -39,6 +39,12 @@ export interface WebsiteStackProps extends StackProps {
   domain?: {
     name: string;
     certificate: ICertificate;
+    /**
+     * The domain is still on another distribution, so this one only gets the
+     * certificate, ready for `aws cloudfront associate-alias` to move the
+     * domain here.
+     */
+    pendingMove?: boolean;
   };
 }
 
@@ -79,6 +85,7 @@ export class WebsiteStack extends Stack {
   constructor(scope: Construct, id: string, props: WebsiteStackProps) {
     super(scope, id, props);
     const { version } = props;
+    const servedDomain = props.domain && !props.domain.pendingMove ? props.domain.name : undefined;
 
     this.bucket = new Bucket(this, 'site-bucket', {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
@@ -152,7 +159,7 @@ export class WebsiteStack extends Stack {
     this.distribution = new Distribution(this, 'distribution', {
       comment: 'kenilworthford.com website',
       certificate: props.domain?.certificate,
-      domainNames: props.domain ? [props.domain.name] : undefined,
+      domainNames: servedDomain ? [servedDomain] : undefined,
       defaultBehavior: {
         allowedMethods: AllowedMethods.ALLOW_GET_HEAD,
         // Honours each file's Cache-Control
@@ -172,6 +179,12 @@ export class WebsiteStack extends Stack {
       // North America and Europe, which covers a UK site's visitors
       priceClass: PriceClass.PRICE_CLASS_100,
     });
+    if (props.domain?.pendingMove) {
+      Annotations.of(this.distribution).acknowledgeWarning(
+        '@aws-cdk/aws-cloudfront:emptyDomainNames',
+        'The domain is moved here with associate-alias, then added',
+      );
+    }
 
     new CfnOutput(this, 'DistributionDomainName', {
       value: this.distribution.distributionDomainName,
@@ -181,8 +194,8 @@ export class WebsiteStack extends Stack {
     });
     new CfnOutput(this, 'BucketName', { value: this.bucket.bucketName });
     new CfnOutput(this, 'Version', { value: version });
-    if (props.domain) {
-      new CfnOutput(this, 'SiteDomain', { value: props.domain.name });
+    if (servedDomain) {
+      new CfnOutput(this, 'SiteDomain', { value: servedDomain });
     }
   }
 }

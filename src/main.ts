@@ -20,11 +20,11 @@ if (!existsSync(join(siteDirectory, version, 'index.html'))) {
 
 // CloudFront only uses certificates in us-east-1, so a stage with a domain
 // has a certificate stack there, which the website stack reads across regions
-const domainName = siteDomain(stage);
-const certificateStack = domainName
+const domain = siteDomain(stage);
+const certificateStack = domain
   ? new CertificateStack(app, 'KenilworthfordWebsiteCertificate', {
     crossRegionReferences: true,
-    domainName,
+    domainName: domain.name,
     env: { region: 'us-east-1' },
   })
   : undefined;
@@ -32,8 +32,8 @@ const certificateStack = domainName
 new WebsiteStack(app, 'KenilworthfordWebsite', {
   apiEndpoint: apiEndpoint(stage),
   crossRegionReferences: !!certificateStack,
-  domain: domainName && certificateStack
-    ? { name: domainName, certificate: certificateStack.certificate }
+  domain: domain && certificateStack
+    ? { ...domain, certificate: certificateStack.certificate }
     : undefined,
   env: { region: 'eu-west-2' },
   siteDirectory,
